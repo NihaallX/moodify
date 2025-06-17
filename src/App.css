@@ -12,6 +12,25 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+.logo-container {
+  margin-bottom: 1rem;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: #1e1e1e;
+  padding: 5px;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
 .App-header h1 {
   margin: 0;
   font-size: 2.5rem;

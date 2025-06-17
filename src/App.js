@@ -20,8 +20,10 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <header className="App-header">
+    <div className="App">      <header className="App-header">
+        <div className="logo-container">
+          <img src="/moodify/images/moodify-logo.png" alt="Moodify Logo" className="logo" />
+        </div>
         <h1>Moodify</h1>
         <p className="App-subtitle">Music recommendations based on your mood</p>
       </header>

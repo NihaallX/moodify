@@ -1,8 +1,7 @@
 import React from 'react';
 import './PlaylistRecommendation.css';
 
-function PlaylistRecommendation({ mood }) {
-  // Mock data for playlists - in a real app, these would come from Spotify API
+function PlaylistRecommendation({ mood }) {  // Mock data for playlists - in a real app, these would come from Spotify API
   const playlists = {
     anxious: [
       {
@@ -16,8 +15,8 @@ function PlaylistRecommendation({ mood }) {
         id: 'anx2',
         name: 'Anxiety Relief',
         description: 'Music to help you breathe and relax',
-        image: 'https://i.scdn.co/image/ab67706f00000002ae39a88211a189fb2a6563a7',
-        url: 'https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO'
+        image: 'https://i.scdn.co/image/ab67706f000000025ec8c003898b36c6f73dfac7',
+        url: 'https://open.spotify.com/playlist/37i9dQZF1DWUMIrOvDVsqO'
       }
     ],
     calm: [
@@ -67,35 +66,34 @@ function PlaylistRecommendation({ mood }) {
         image: 'https://i.scdn.co/image/ab67706f000000025f0ff9251e3cfe641160dc31',
         url: 'https://open.spotify.com/playlist/37i9dQZF1DX3YSRoSdA634'
       }
-    ],
-    energetic: [
+    ],    energetic: [
       {
         id: 'energy1',
-        name: 'Workout',
-        description: 'Energy for your training session',
+        name: 'Beast Mode',
+        description: 'Get your beast mode on!',
         image: 'https://i.scdn.co/image/ab67706f000000029249b35f23fb596b6f006a15',
         url: 'https://open.spotify.com/playlist/37i9dQZF1DX76Wlfdnj7AP'
       },
       {
         id: 'energy2',
-        name: 'Power Workout',
-        description: 'Up-tempo tracks to power your workout',
-        image: 'https://i.scdn.co/image/ab67706f000000026e1034e2a2431d26fb0dcd2c',
-        url: 'https://open.spotify.com/playlist/37i9dQZF1DX5OUjSS1OMgV'
+        name: 'Energy Booster: Rock',
+        description: 'Feel-good rock to get your energy levels up!',
+        image: 'https://i.scdn.co/image/ab67706f0000000299251b32401022b42b765eda',
+        url: 'https://open.spotify.com/playlist/37i9dQZF1DWZixSclZdoFE'
       }
     ],
     study: [
       {
         id: 'study1',
-        name: 'Intense Studying',
-        description: 'Focus-enhancing piano for your productive study session',
+        name: 'Lo-Fi Beats',
+        description: 'Beats to relax/study to',
         image: 'https://i.scdn.co/image/ab67706f00000002863b311d4b787ed621f7e696',
-        url: 'https://open.spotify.com/playlist/37i9dQZF1DX8NTLI2TtZa6'
+        url: 'https://open.spotify.com/playlist/37i9dQZF1DWWQRwui0ExPn'
       },
       {
         id: 'study2',
-        name: 'Study Zone',
-        description: 'Calm instrumental concentration. Focus music for better study.',
+        name: 'Instrumental Study',
+        description: 'Focus with soft study music in the background.',
         image: 'https://i.scdn.co/image/ab67706f000000020f38a38658592f7c4cf0578f',
         url: 'https://open.spotify.com/playlist/37i9dQZF1DX9sIqqvKsjG8'
       }
