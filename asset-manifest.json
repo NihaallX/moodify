@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/moodify/static/css/main.7be34cfc.css",
+    "main.js": "/moodify/static/js/main.921e43d8.js",
+    "index.html": "/moodify/index.html",
+    "main.7be34cfc.css.map": "/moodify/static/css/main.7be34cfc.css.map",
+    "main.921e43d8.js.map": "/moodify/static/js/main.921e43d8.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.7be34cfc.css",
+    "static/js/main.921e43d8.js"
+  ]
+}
