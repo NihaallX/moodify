@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './PlaylistCard.css';
 
 function PlaylistCard({ playlist }) {
   const [imageError, setImageError] = useState(false);
@@ -13,6 +14,9 @@ function PlaylistCard({ playlist }) {
     const hue = hash % 360;
     return `hsl(${hue}, 70%, 70%)`;
   };
+
+  // Default image path if the image fails to load
+  const defaultImage = process.env.PUBLIC_URL + '/images/playlists/default-playlist.svg';
 
   // Fallback style when image fails to load
   const fallbackStyle = {
@@ -48,7 +52,10 @@ function PlaylistCard({ playlist }) {
             alt={playlist.name}
             style={{ display: imageLoaded ? 'block' : 'none' }}
             onLoad={() => setImageLoaded(true)}
-            onError={() => setImageError(true)}
+            onError={() => {
+              console.log(`Failed to load image for ${playlist.name}, using fallback`);
+              setImageError(true);
+            }}
           />
         )}
       </div>
@@ -58,7 +65,7 @@ function PlaylistCard({ playlist }) {
         <a 
           href={playlist.url} 
           target="_blank" 
-          rel="noopener noreferrer"
+          rel="noopener noreferrer" 
           className="playlist-link"
         >
           Listen on Spotify
