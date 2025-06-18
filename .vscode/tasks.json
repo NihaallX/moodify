@@ -38,6 +38,14 @@
         "isDefault": true
       },
       "problemMatcher": []
+    },
+    {
+      "label": "Deploy to GitHub Pages",
+      "type": "shell",
+      "command": "npm run deploy",
+      "group": "build",
+      "problemMatcher": [],
+      "dependsOn": ["Build for Production"]
     }
   ]
 }
