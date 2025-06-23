@@ -14,9 +14,7 @@ function PlaylistCard({ playlist }) {
     const hue = hash % 360;
     return `hsl(${hue}, 70%, 70%)`;
   };
-
-  // Default image path if the image fails to load
-  const defaultImage = process.env.PUBLIC_URL + '/images/playlists/default-playlist.svg';
+  // Not using a default image file - we're using a color-based fallback instead
 
   // Fallback style when image fails to load
   const fallbackStyle = {

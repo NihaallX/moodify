@@ -91,3 +91,33 @@
   text-align: center;
   color: #999;
 }
+
+.playlist-loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.playlist-loading .loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #1DB954;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 15px;
+}
+
+.playlist-error {
+  padding: 15px;
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

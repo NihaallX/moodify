@@ -1,10 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './PlaylistRecommendation.css';
 import PlaylistCard from './PlaylistCard';
+import spotifyService from '../services/spotifyService';
 
 function PlaylistRecommendation({ mood }) {
-  // Mock data for playlists - in a real app, these would come from Spotify API
-  const playlists = {
+  const [playlists, setPlaylists] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    const fetchPlaylists = async () => {
+      try {
+        setLoading(true);
+        const fetchedPlaylists = await spotifyService.getPlaylistsByMood(mood);
+        setPlaylists(fetchedPlaylists);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching playlists:', error);
+        setError('Failed to load playlists. Using fallback data.');
+        setLoading(false);
+      }
+    };
+    
+    fetchPlaylists();
+  }, [mood]);
+  
+  // Fallback mock data for playlists - in case API fails or user is not authenticated
+  const mockPlaylists = {
     anxious: [
       {
         id: 'anx1',
@@ -167,26 +189,82 @@ function PlaylistRecommendation({ mood }) {
       image: 'https://images.unsplash.com/photo-1483412033650-1015ddeb83d1?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80',
       url: 'https://open.spotify.com/playlist/37i9dQZF1DX4WYpdgoIcn6'
     }
-  ];
-
-  // Get playlists for the mood
-  const moodPlaylists = playlists[mood] || defaultPlaylists;
+  ];  // Process playlists to ensure all required fields are present
+  const processPlaylists = (playlistArray) => {
+    if (!playlistArray || !Array.isArray(playlistArray)) return [];
+    
+    return playlistArray
+      .filter(playlist => playlist && playlist !== null) // Filter out null/undefined playlists
+      .map(playlist => ({
+        id: playlist.id || `fallback-${Math.random().toString(36).substring(2, 10)}`, // Generate ID if missing
+        name: playlist.name || 'Unknown Playlist',
+        description: playlist.description || 'No description available',
+        image: playlist.images && playlist.images[0]?.url 
+          ? playlist.images[0].url
+          : playlist.image || 'https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=300&q=80', // Fallback image
+        url: playlist.external_urls?.spotify || playlist.url || 'https://open.spotify.com'
+      }));
+  };
+  
+  // Use playlists from API or fallback to mock data if needed
+  const rawDisplayPlaylists = loading 
+    ? [] 
+    : (playlists && playlists.length > 0)
+      ? playlists
+      : mockPlaylists[mood.toLowerCase()] || defaultPlaylists;
+  
+  // Process playlists to ensure all have required fields
+  const displayPlaylists = processPlaylists(rawDisplayPlaylists);
 
   return (
     <div className="playlist-recommendation">
       <h2>Recommended Playlists for You</h2>
+      
+      {loading && (
+        <div className="playlist-loading">
+          <div className="loader"></div>
+          <p>Finding the perfect playlists for your mood...</p>
+        </div>
+      )}
+      
+      {error && (
+        <div className="playlist-error">
+          <p>{error}</p>
+        </div>
+      )}
+      
+      {!loading && displayPlaylists.length === 0 && (
+        <div className="playlist-error">
+          <p>No playlists found for this mood. Try another mood!</p>
+        </div>
+      )}
+      
       <div className="playlists-container">
-        {moodPlaylists.map(playlist => (
-          <PlaylistCard key={playlist.id} playlist={playlist} />
+        {displayPlaylists.map(playlist => (
+          <PlaylistCard 
+            key={playlist.id} 
+            playlist={playlist}
+          />
         ))}
       </div>
-      <div className="spotify-note">
-        <p>
-          <small>
-            Note: In the full version, you'll be able to play these directly via the Spotify API with authentication.
-          </small>
-        </p>
-      </div>
+      
+      {spotifyService.isLoggedIn() ? (
+        <div className="spotify-note">
+          <p>
+            <small>
+              Powered by Spotify. Click any playlist to open it in Spotify.
+            </small>
+          </p>
+        </div>
+      ) : (
+        <div className="spotify-note">
+          <p>
+            <small>
+              Connect with Spotify for personalized recommendations!
+            </small>
+          </p>
+        </div>
+      )}
     </div>
   );
 }

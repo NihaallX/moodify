@@ -7,9 +7,11 @@ A mood-based music recommendation web application that suggests Spotify playlist
 ## Features
 
 - **Mood Detection**: Input your mood via text or an emoji slider
+- **Spotify Integration**: Connect to your Spotify account for personalized recommendations
 - **Playlist Recommendation**: Get Spotify playlists that match your current mood
 - **Emotional Messages**: Receive supportive or celebratory messages based on your mood
 - **Simple, Clean UI**: Easy-to-use interface with no unnecessary complexity
+- **Secure Authentication**: Using PKCE flow for enhanced security
 
 ## Tech Stack
 
@@ -48,12 +50,21 @@ A mood-based music recommendation web application that suggests Spotify playlist
 
 ## Spotify API Integration
 
-To enable full functionality with the Spotify API:
+Moodify now integrates with the Spotify API using the PKCE (Proof Key for Code Exchange) authentication flow for enhanced security. To set up:
 
 1. Create a Spotify Developer account at [https://developer.spotify.com](https://developer.spotify.com)
-2. Register a new application to get your Client ID
+2. Register a new application in the Spotify Developer Dashboard:
+   - Set your redirect URI to `https://nihaallx.github.io/moodify/` (with trailing slash, Spotify requires HTTPS for security reasons)
+   - Request the following scopes: `user-read-private`, `user-read-email`, `playlist-read-private`, `playlist-read-collaborative`, `user-top-read`, `user-read-recently-played`, `user-library-read`
+
 3. Update the `clientId` in `src/services/spotifyService.js` with your Client ID
-4. Set your redirect URI in the Spotify Developer Dashboard to match the URI in the code
+
+4. Authenticate with Spotify by clicking the "Connect with Spotify" button in the app
+
+The PKCE flow offers several advantages:
+- More secure than Implicit Grant (no client secret needed in frontend)
+- Supports refresh tokens for longer sessions
+- Better user experience with automatic token refreshing
 
 ## Future Enhancements
 
