@@ -104,12 +104,16 @@ function SpotifyCallback() {
 
     handleCallback();
   }, [navigate]);
-
   return (
     <div className="spotify-callback">
       <div className="loading-container">
         <div className="loader"></div>
-        <p>{status}</p>
+        <p>{status}</p>        {status.includes('Authentication successful') && (
+          <p className="refresh-note">
+            Taking too long? No worries!
+            <br />Just <button className="refresh-button" onClick={() => window.location.href = "/"}>tap here</button> or refresh the page to vibe with your moods.
+          </p>
+        )}
       </div>
     </div>
   );
