@@ -46,27 +46,33 @@ function UserProfile({ onLogout }) {
 
   if (error) {
     return <div className="user-profile-error">{error}</div>;
-  }
-
-  return (
+  }  return (
     user && (
-      <div className="user-profile">
+      <div className="user-profile" title={user.email ? `Email: ${user.email}` : ''}>
         <div className="user-info">
-          {user.images && user.images[0] && (
+          {user.images && user.images[0] ? (
             <img 
               src={user.images[0].url} 
               alt={user.display_name} 
               className="user-avatar" 
+              title={`${user.display_name} • ${user.email || 'No email provided'}`}
             />
+          ) : (
+            <div className="user-avatar-placeholder" title={`${user.display_name} • ${user.email || 'No email provided'}`}>
+              {user.display_name ? user.display_name[0].toUpperCase() : '?'}
+            </div>
           )}
-          <div className="user-details">
-            <h3>{user.display_name}</h3>
-            <p>{user.email}</p>
-          </div>
+          <span className="user-display-name">{user.display_name}</span>
+          <button 
+            className="logout-button" 
+            onClick={handleLogout}
+            title="Log out"
+          >
+            <svg viewBox="0 0 24 24" className="logout-icon">
+              <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"></path>
+            </svg>
+          </button>
         </div>
-        <button className="logout-button" onClick={handleLogout}>
-          Log Out
-        </button>
       </div>
     )
   );
