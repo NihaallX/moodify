@@ -7,31 +7,84 @@
   border: 1px solid rgba(234, 234, 255, 0.5);
 }
 
+.input-type-toggle-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
 .input-type-toggle {
   display: flex;
-  margin-bottom: 1.5rem;
   justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 1.5rem;
+  position: relative;
 }
 
 .input-type-toggle button {
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 0;
   border: none;
   background: #f0f0f0;
   font-size: 1rem;
   cursor: pointer;
-  flex: 1;
   transition: all 0.3s;
   outline: none;
   font-weight: 600;
   letter-spacing: 0.5px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.input-type-toggle button:not(.reset-button) {
+  width: 50%;
+  flex: 0 0 50%;
 }
 
 .input-type-toggle button:first-child {
   border-radius: 12px 0 0 12px;
 }
 
-.input-type-toggle button:last-child {
+.input-type-toggle button:nth-child(2) {
   border-radius: 0 12px 12px 0;
+}
+
+.reset-button {
+  background: #f0f0f0;
+  color: #888;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: -48px;
+  top: 50%;
+  transform: translateY(-50%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.reset-icon {
+  display: inline-block;
+  line-height: 1;
+}
+
+.reset-button:hover {
+  background: #e0e0e0;
+  color: #555;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  transform: translateY(-50%) rotate(90deg);
 }
 
 .input-type-toggle button.active {
@@ -76,36 +129,45 @@ input[type="text"]:focus {
 .emoji-slider-container {
   display: flex;
   align-items: center;
-  margin: 1.5rem 0;
+  margin: 2rem 0;
+  position: relative;
 }
 
 .emoji-slider {
   flex: 1;
   margin: 0 1.5rem;
-  height: 12px;
+  height: 16px;
   -webkit-appearance: none;
   appearance: none;
-  background: linear-gradient(to right, #6e8efb, #a777e3);
-  border-radius: 8px;
+  background: linear-gradient(to right, 
+    #ff6b6b, /* Sad/angry - red */
+    #feca57, /* Neutral - yellow */
+    #1dd1a1, /* Happy - green */
+    #5f27cd  /* Energetic - purple */
+  );
+  border-radius: 12px;
   outline: none;
-  box-shadow: 0 2px 12px rgba(110, 142, 251, 0.2);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
 }
 
 .emoji-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: white;
   border: 3px solid #a777e3;
   cursor: pointer;
-  box-shadow: 0 0 10px rgba(167, 119, 227, 0.5);
-  transition: all 0.2s;
+  box-shadow: 0 0 15px rgba(167, 119, 227, 0.5);
+  transition: all 0.3s;
+  z-index: 2;
 }
 
 .emoji-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
+  transform: scale(1.15);
+  box-shadow: 0 0 20px rgba(167, 119, 227, 0.8);
 }
 
 .emoji-slider::-moz-range-thumb {
@@ -124,17 +186,19 @@ input[type="text"]:focus {
 }
 
 .current-emoji {
-  font-size: 4rem;
-  margin: 1.5rem 0;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  animation: pulse 1.5s infinite alternate;
+  font-size: 5rem;
+  margin: 2rem 0;
+  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  animation: pulse 1.8s infinite alternate;
+  position: relative;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Segoe UI Symbol", "Android Emoji", "EmojiSymbols", sans-serif;
 }
 
 button[type="submit"],
 .emoji-input-form button {
   background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
   color: white;
-  padding: 1rem 1.5rem;
+  padding: 1.2rem 2rem;
   border: none;
   border-radius: 12px;
   font-size: 1.1rem;
@@ -147,6 +211,7 @@ button[type="submit"],
   position: relative;
   overflow: hidden;
   z-index: 1;
+  box-shadow: 0 8px 25px -5px rgba(167, 119, 227, 0.5);
 }
 
 button[type="submit"]::after,
@@ -175,8 +240,9 @@ button[type="submit"]:hover,
 }
 
 .emoji-label {
-  font-size: 2rem;
-  margin: 0 0.5rem;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Segoe UI Symbol", "Android Emoji", "EmojiSymbols", sans-serif;
+  font-size: 1.5rem;
+  min-width: 24px;
 }
 
 @keyframes pulse {
