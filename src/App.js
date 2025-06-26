@@ -58,27 +58,28 @@ function App() {
   };
 
   // Main application content
-  const AppContent = () => (
-    <div className="App">
-      {window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? (
+  const AppContent = () => {
+    // We now show the banner everywhere, not just in local environments
+    return (
+      <div className="App">
         <div className="dev-banner">
-          🚀 Dev Mode 🎧 Want full access? Shoot a message to <a href="mailto:nihalpardeshi12344@gmail.com">nihalpardeshi12344@gmail.com</a> for VIP access
+          🚀 Want full access? 🎧 Shoot a message to <a href="mailto:nihalpardeshi12344@gmail.com">nihalpardeshi12344@gmail.com</a> for VIP access
         </div>
-      ) : null}
-      <header className="App-header">
-        <div className="logo-container">          <img 
-            src={`${process.env.PUBLIC_URL}/images/moodify-logo.png`} 
-            alt="Moodify Logo" 
-            className="logo" 
-          />
-        </div>
-        <h1>Moodify</h1>
-        <p className="App-subtitle">Music recommendations based on your mood</p>
+        <header className="App-header">
+          <div className="logo-container">
+            <img 
+              src={`${process.env.PUBLIC_URL}/images/moodify-logo.png`} 
+              alt="Moodify Logo" 
+              className="logo" 
+            />
+          </div>
+          <h1>Moodify</h1>
+          <p className="App-subtitle">Music recommendations based on your mood</p>
           {isAuthenticated ? (
-          <UserProfile onLogout={handleLogout} />
-        ) : (
-          <SpotifyLoginButton />
-        )}
+            <UserProfile onLogout={handleLogout} />
+          ) : (
+            <SpotifyLoginButton />
+          )}
       </header>
       
       {!isAuthenticated && process.env.NODE_ENV === 'development' && (
@@ -152,7 +153,10 @@ function App() {
           <p className="made-with-love">Made with ❤️ by Nihal</p>
         </div>
       </footer>
-    </div>  );
+    </div>
+    );
+  };
+  
   // More comprehensive check for callback parameters
   const hasCallbackParams = () => {
     // Check in query parameters
@@ -185,7 +189,8 @@ function App() {
       <Routes>
         <Route path="/" element={hasCallbackParams() ? <SpotifyCallback /> : <AppContent />} />
         <Route path="/callback" element={<SpotifyCallback />} /> {/* Keeping this for backward compatibility */}
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="/index.html" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
