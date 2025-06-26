@@ -15,6 +15,8 @@ function App() {
   const [currentMood, setCurrentMood] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [lastInput, setLastInput] = useState(null);
+  const [lastInputType, setLastInputType] = useState(null);
 
   useEffect(() => {
     // Check if user is logged in on component mount
@@ -34,11 +36,21 @@ function App() {
   const handleMoodSubmission = async (input, inputType) => {
     setIsLoading(true);
     
+    // Save the last submitted input and type
+    setLastInput(input);
+    setLastInputType(inputType);
+    
     // Detect mood based on input
     const detectedMood = await detectMood(input, inputType);
     setCurrentMood(detectedMood);
     
     setIsLoading(false);
+  };
+  
+  const handleReset = () => {
+    setCurrentMood(null);
+    setLastInput(null);
+    setLastInputType('emoji'); // Default to emoji mode when resetting
   };
 
   const handleLogout = () => {
@@ -48,6 +60,11 @@ function App() {
   // Main application content
   const AppContent = () => (
     <div className="App">
+      {window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? (
+        <div className="dev-banner">
+          🚀 Dev Mode 🎧 Want full access? Shoot a message to <a href="mailto:nihalpardeshi12344@gmail.com">nihalpardeshi12344@gmail.com</a> for VIP access
+        </div>
+      ) : null}
       <header className="App-header">
         <div className="logo-container">          <img 
             src={`${process.env.PUBLIC_URL}/images/moodify-logo.png`} 
@@ -68,22 +85,72 @@ function App() {
         <LocalDevAuth />
       )}
       
-      <main className="App-main">
-        <MoodInput onMoodSubmit={handleMoodSubmission} />
-        
-        {isLoading && <div className="loader">Analyzing your mood...</div>}
+      <main className={`App-main ${currentMood && !isLoading ? 'with-results' : ''}`}>
+        <div className="mood-input-container">
+          <MoodInput 
+            onMoodSubmit={handleMoodSubmission} 
+            lastInput={lastInput} 
+            lastInputType={lastInputType} 
+            showReset={currentMood !== null && !isLoading}
+            onReset={handleReset}
+          />
+          {isLoading && <div className="loader">Analyzing your mood...</div>}
+        </div>
         
         {currentMood && !isLoading && (
-          <div className="results-container">
-            <MoodMessage mood={currentMood} />
-            <PlaylistRecommendation mood={currentMood} />
+          <div className="results-side">
+            <div className="results-container">
+              <MoodMessage mood={currentMood} />
+              <PlaylistRecommendation mood={currentMood} />
+            </div>
           </div>
         )}
       </main>
       
       <footer className="App-footer">
-        <p>© {new Date().getFullYear()} Moodify</p>
-        <p className="made-with-love">Made with ❤️ by Nihal</p>
+        <div className="footer-content">
+          <div className="footer-section">
+            <h3>About Moodify</h3>
+            <p>Moodify analyzes your mood and recommends Spotify playlists to match how you're feeling.</p>
+          </div>
+          
+          <div className="footer-section">
+            <h3>Connect</h3>
+            <ul className="footer-links">
+              <li>
+                <a href="mailto:nihalpardeshi12344@gmail.com">
+                  ✉️ nihalpardeshi12344@gmail.com
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/NihaallX/moodify" target="_blank" rel="noopener noreferrer">
+                  🔗 GitHub Repository
+                </a>
+              </li>
+            </ul>
+          </div>
+          
+          <div className="footer-section">
+            <h3>Resources</h3>
+            <ul className="footer-links">
+              <li>
+                <a href="https://developer.spotify.com/documentation/" target="_blank" rel="noopener noreferrer">
+                  🎵 Spotify API
+                </a>
+              </li>
+              <li>
+                <a href="https://reactjs.org/" target="_blank" rel="noopener noreferrer">
+                  ⚛️ React
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <div className="footer-bottom">
+          <p>© {new Date().getFullYear()} Moodify</p>
+          <p className="made-with-love">Made with ❤️ by Nihal</p>
+        </div>
       </footer>
     </div>  );
   // More comprehensive check for callback parameters

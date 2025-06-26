@@ -1,15 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './MoodInput.css';
 
-function MoodInput({ onMoodSubmit }) {
-  const [inputType, setInputType] = useState('text'); // 'text' or 'emoji'
+function MoodInput({ onMoodSubmit, lastInput, lastInputType, showReset, onReset }) {
+  const [inputType, setInputType] = useState(lastInputType || 'emoji'); // Default to emoji mode
   const [textInput, setTextInput] = useState('');
   const [emojiValue, setEmojiValue] = useState(5); // Middle value on scale of 0-10
   
+  // Update component state when lastInput changes
+  useEffect(() => {
+    if (lastInputType === 'text' && lastInput) {
+      setTextInput(lastInput);
+      setInputType('text');
+    } else if (lastInputType === 'emoji' && lastInput !== null) {
+      setEmojiValue(lastInput);
+      setInputType('emoji');
+    }
+  }, [lastInput, lastInputType]);
+  
   // Emoji mapping for the slider
   const emojiMap = [
-    '😔', '😟', '😐', '🙂', '😊', 
-    '😃', '😎', '😤', '😡', '🥳', '😴'
+    "😔", "😟", "😐", "🙂", "😊", 
+    "😃", "😎", "😤", "😡", "🥳", "😴"
   ];
 
   const handleTextSubmit = (e) => {
@@ -23,21 +34,40 @@ function MoodInput({ onMoodSubmit }) {
     onMoodSubmit(emojiValue, 'emoji');
   };
 
+  const handleReset = () => {
+    // Reset local state
+    setTextInput('');
+    setEmojiValue(5);
+    setInputType('emoji'); // Default to emoji mode on reset
+    
+    // Call parent reset function
+    if (onReset) {
+      onReset();
+    }
+  };
+
   return (
     <div className="mood-input">
-      <div className="input-type-toggle">
-        <button 
-          className={inputType === 'text' ? 'active' : ''}
-          onClick={() => setInputType('text')}
-        >
-          Text Input
-        </button>
-        <button 
-          className={inputType === 'emoji' ? 'active' : ''}
-          onClick={() => setInputType('emoji')}
-        >
-          Emoji Slider
-        </button>
+      <div className="input-type-toggle-container">
+        <div className="input-type-toggle">
+          <button 
+            className={inputType === 'emoji' ? 'active' : ''}
+            onClick={() => setInputType('emoji')}
+          >
+            Emoji Mode
+          </button>
+          <button 
+            className={inputType === 'text' ? 'active' : ''}
+            onClick={() => setInputType('text')}
+          >
+            Text Mode
+          </button>
+          {showReset && (
+            <button className="reset-button" onClick={handleReset}>
+              <span className="reset-icon">↺</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {inputType === 'text' ? (
