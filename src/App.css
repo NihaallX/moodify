@@ -143,9 +143,34 @@ body {
 }
 
 .loader {
-  margin: 2rem 0;
-  font-size: 1.2rem;
-  color: #666;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+  margin: 1rem 0;
+}
+
+.loader p {
+  margin-top: 1rem;
+  color: #8A2BE2;
+  font-weight: 500;
+}
+
+.loader-animation {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(138, 43, 226, 0.2);
+  border-radius: 50%;
+  border-top-color: #8A2BE2;
+  border-right-color: #FF69B4;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .App-footer {
