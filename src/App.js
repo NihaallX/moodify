@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import MoodInput from './components/MoodInput';
+import ChatInput from './components/ChatInput';
+import InputSelector from './components/InputSelector';
 import MoodMessage from './components/MoodMessage';
 import PlaylistRecommendation from './components/PlaylistRecommendation';
 import SpotifyLoginButton from './components/SpotifyLoginButton';
 import SpotifyCallback from './components/SpotifyCallback';
 import UserProfile from './components/UserProfile';
 import LocalDevAuth from './components/LocalDevAuth';
-import { detectMood } from './utils/moodDetector';
+import { detectMood } from './utils/moodDetection';
+import { DETECTION_TYPES } from './utils/moodDetection/constants';
 import spotifyService from './services/spotifyService';
 
 function App() {
@@ -17,6 +20,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [lastInput, setLastInput] = useState(null);
   const [lastInputType, setLastInputType] = useState(null);
+  const [activeInputMode, setActiveInputMode] = useState(DETECTION_TYPES.EMOJI); // Default to emoji mode
 
   useEffect(() => {
     // Check if user is logged in on component mount
@@ -33,24 +37,48 @@ function App() {
     return () => clearInterval(intervalId);
   }, []);
 
+  // Initialize lastInputType if it exists in local storage
+  useEffect(() => {
+    const savedInputType = localStorage.getItem('moodify-input-type');
+    if (savedInputType) {
+      setActiveInputMode(savedInputType);
+      setLastInputType(savedInputType);
+    }
+  }, []);
+
+  const handleInputModeChange = (mode) => {
+    setActiveInputMode(mode);
+    // Save preference to local storage for persistence
+    localStorage.setItem('moodify-input-type', mode);
+  };
+
   const handleMoodSubmission = async (input, inputType) => {
     setIsLoading(true);
     
     // Save the last submitted input and type
     setLastInput(input);
     setLastInputType(inputType);
+    localStorage.setItem('moodify-input-type', inputType);
     
     // Detect mood based on input
-    const detectedMood = await detectMood(input, inputType);
-    setCurrentMood(detectedMood);
-    
-    setIsLoading(false);
+    try {
+      const detectedMood = await detectMood(input, inputType);
+      setCurrentMood(detectedMood);
+      console.log(`Detected mood: ${detectedMood} from ${inputType} input`);
+    } catch (error) {
+      console.error('Error detecting mood:', error);
+      // Provide user feedback about the error
+      alert('Sorry, we had trouble analyzing your mood. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const handleReset = () => {
     setCurrentMood(null);
     setLastInput(null);
-    setLastInputType('emoji'); // Default to emoji mode when resetting
+    // Keep the current active input mode instead of forcing emoji mode
+    setLastInputType(activeInputMode);
   };
 
   const handleLogout = () => {
@@ -88,14 +116,32 @@ function App() {
       
       <main className={`App-main ${currentMood && !isLoading ? 'with-results' : ''}`}>
         <div className="mood-input-container">
-          <MoodInput 
-            onMoodSubmit={handleMoodSubmission} 
-            lastInput={lastInput} 
-            lastInputType={lastInputType} 
-            showReset={currentMood !== null && !isLoading}
-            onReset={handleReset}
+          <InputSelector 
+            activeInput={activeInputMode} 
+            onInputChange={handleInputModeChange} 
           />
-          {isLoading && <div className="loader">Analyzing your mood...</div>}
+          
+          {activeInputMode === DETECTION_TYPES.EMOJI ? (
+            <MoodInput 
+              onMoodSubmit={handleMoodSubmission} 
+              lastInput={lastInputType === DETECTION_TYPES.EMOJI ? lastInput : 5} 
+              lastInputType={DETECTION_TYPES.EMOJI}
+              showReset={currentMood !== null && !isLoading}
+              onReset={handleReset}
+            />
+          ) : (
+            <ChatInput 
+              onMoodSubmit={handleMoodSubmission}
+              lastInput={lastInputType === DETECTION_TYPES.CHAT ? lastInput : null}
+            />
+          )}
+          
+          {isLoading && (
+            <div className="loader">
+              <div className="loader-animation"></div>
+              <p>Analyzing your mood...</p>
+            </div>
+          )}
         </div>
         
         {currentMood && !isLoading && (
@@ -126,6 +172,11 @@ function App() {
               <li>
                 <a href="https://github.com/NihaallX/moodify" target="_blank" rel="noopener noreferrer">
                   🔗 GitHub Repository
+                </a>
+              </li>
+              <li>
+                <a href="./landing.html">
+                  📄 Back to Landing Page
                 </a>
               </li>
             </ul>
