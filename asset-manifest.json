@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/moodify/static/css/main.fd74aacd.css",
-    "main.js": "/moodify/static/js/main.a1654816.js",
+    "main.css": "/moodify/static/css/main.4a40eb44.css",
+    "main.js": "/moodify/static/js/main.3b0066eb.js",
     "index.html": "/moodify/index.html",
-    "main.fd74aacd.css.map": "/moodify/static/css/main.fd74aacd.css.map",
-    "main.a1654816.js.map": "/moodify/static/js/main.a1654816.js.map"
+    "main.4a40eb44.css.map": "/moodify/static/css/main.4a40eb44.css.map",
+    "main.3b0066eb.js.map": "/moodify/static/js/main.3b0066eb.js.map"
   },
   "entrypoints": [
-    "static/css/main.fd74aacd.css",
-    "static/js/main.a1654816.js"
+    "static/css/main.4a40eb44.css",
+    "static/js/main.3b0066eb.js"
   ]
 }
