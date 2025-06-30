@@ -33,10 +33,13 @@ const callHartmannAI = async (text) => {
     }
     
     const result = await response.json();
+    console.log('API raw response:', result);
     
     // Parse the JSON response from Hartmann model
     if (result && result.data && result.data[0]) {
+      console.log('API data[0]:', result.data[0]);
       const moodData = JSON.parse(result.data[0]);
+      console.log('Parsed mood data:', moodData);
       
       if (moodData && moodData.mood) {
         return {
