@@ -2,7 +2,7 @@
 
 A mood-based music recommendation web application that suggests Spotify playlists based on your current emotional state.
 
-![Moodify Banner](https://i.imgur.com/LTFxFOs.png)
+(![moodify-logo png](https://github.com/user-attachments/assets/ec1a7b94-b088-493f-9383-cf19d57691e6)
 
 ## Features
 
