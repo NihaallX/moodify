@@ -97,67 +97,54 @@ const detectMoodLocally = (text) => {
 };
 
 /**
- * Call external AI API for sentiment and mood analysis
+ * Call Mistral AI API via Hugging Face Space for mood analysis
  * @param {string} text - User's chat message
  * @returns {Promise<Object|null>} API response or null on failure
  */
 const callAiApi = async (text) => {
-  // This is where you would integrate with an external API
-  // For example, OpenAI, Google Cloud NLP, or Azure Text Analytics
-
-  // For now, we'll simulate an API call with a delay
+  // URL of your Hugging Face Space API endpoint
+  // Replace with your actual deployed space URL
+  const apiUrl = 'https://yourusername-moodify-mood-detection.hf.space/api/predict';
+  
   try {
-    // In a real implementation, you would make an API call like:
-    // const response = await fetch('https://api.example.com/sentiment', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ text })
-    // });
-    // return response.json();
-
-    // Simulated API response
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // Simple sentiment simulation based on positive/negative words
-        const positiveWords = ['happy', 'good', 'great', 'excellent', 'love', 'enjoy', 'wonderful'];
-        const negativeWords = ['sad', 'bad', 'awful', 'terrible', 'hate', 'dislike', 'upset'];
-        
-        const lowercaseText = text.toLowerCase();
-        let positiveCount = 0;
-        let negativeCount = 0;
-        
-        positiveWords.forEach(word => {
-          if (lowercaseText.includes(word)) positiveCount++;
-        });
-        
-        negativeWords.forEach(word => {
-          if (lowercaseText.includes(word)) negativeCount++;
-        });
-        
-        let sentiment;
-        if (positiveCount > negativeCount + 1) {
-          sentiment = 'very_positive';
-        } else if (positiveCount > negativeCount) {
-          sentiment = 'positive';
-        } else if (negativeCount > positiveCount + 1) {
-          sentiment = 'very_negative';
-        } else if (negativeCount > positiveCount) {
-          sentiment = 'negative';
-        } else {
-          sentiment = 'neutral';
-        }
-        
-        resolve({
-          success: true,
-          sentiment,
-          // This would come from a real AI model
-          dominantEmotions: detectMoodLocally(text),
-          confidence: 0.85
-        });
-      }, 1000);
+    // Set a timeout to prevent hanging if the API is slow
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: [text]
+      }),
+      signal: controller.signal
     });
+    
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      throw new Error(`API returned status code ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    // Parse the JSON string from the API response
+    if (result && result.data && result.data[0]) {
+      const moodData = JSON.parse(result.data[0]);
+      
+      // Check if we received a valid mood
+      if (moodData && moodData.mood) {
+        return {
+          success: true,
+          dominantEmotions: moodData.mood.toLowerCase(),
+          confidence: 0.9
+        };
+      }
+    }
+    
+    throw new Error('Invalid response format from API');
   } catch (error) {
-    console.error('Error calling AI API:', error);
+    console.error('Error calling Mood Detection API:', error);
     return null;
   }
 };

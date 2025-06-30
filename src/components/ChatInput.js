@@ -6,6 +6,7 @@ function ChatInput({ onMoodSubmit, lastInput }) {
   const [chatHistory, setChatHistory] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false); // Track API processing state
   const chatEndRef = useRef(null);
 
   // Prepopulate with last input if available
@@ -26,10 +27,10 @@ function ChatInput({ onMoodSubmit, lastInput }) {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatHistory]);
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     
-    if (!currentMessage.trim()) return;
+    if (!currentMessage.trim() || isProcessing) return;
     
     // Add user message to chat
     const newMessage = {
@@ -39,18 +40,38 @@ function ChatInput({ onMoodSubmit, lastInput }) {
     };
     
     setChatHistory((prev) => [...prev, newMessage]);
+    const userMessageText = currentMessage;
     setCurrentMessage('');
     
-    // Send to parent for mood detection
-    onMoodSubmit(currentMessage, DETECTION_TYPES.CHAT);
+    // Show typing indicator while processing mood
+    setIsTyping(true);
+    setIsProcessing(true);
     
-    // Simulate AI response (in a real app, this would come from actual AI response)
-    simulateResponse();
+    try {
+      // Send to parent for mood detection
+      await onMoodSubmit(userMessageText, DETECTION_TYPES.CHAT);
+      
+      // Add AI response after mood has been processed
+      simulateResponse();
+    } catch (error) {
+      console.error('Error processing mood:', error);
+      
+      // Add error message to chat
+      const errorMessage = {
+        text: "Sorry, I didn't catch that. Try again?",
+        sender: 'bot',
+        timestamp: new Date().toISOString(),
+        isError: true
+      };
+      
+      setChatHistory((prev) => [...prev, errorMessage]);
+      setIsTyping(false);
+      setIsProcessing(false);
+    }
   };
 
   const simulateResponse = () => {
-    setIsTyping(true);
-    
+    // Wait a brief moment to make the interaction feel more natural
     setTimeout(() => {
       const botResponses = [
         "I'll find music that matches your mood!",
@@ -70,7 +91,8 @@ function ChatInput({ onMoodSubmit, lastInput }) {
       
       setChatHistory((prev) => [...prev, botMessage]);
       setIsTyping(false);
-    }, 1500);
+      setIsProcessing(false);
+    }, 800);
   };
 
   return (
@@ -121,12 +143,21 @@ function ChatInput({ onMoodSubmit, lastInput }) {
           onChange={(e) => setCurrentMessage(e.target.value)}
           placeholder="How are you feeling today?"
           aria-label="Chat message"
+          disabled={isProcessing}
         />
-        <button type="submit" disabled={!currentMessage.trim()}>
-          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13"></line>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-          </svg>
+        <button 
+          type="submit" 
+          disabled={!currentMessage.trim() || isProcessing}
+          className={isProcessing ? 'processing' : ''}
+        >
+          {isProcessing ? (
+            <div className="button-spinner"></div>
+          ) : (
+            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          )}
         </button>
       </form>
     </div>
