@@ -1,114 +1,21 @@
 /**
  * Chatbot-based Mood Detection
- * Uses advanced NLP/AI to detect mood from conversational text
+ * Uses Hartmann's emotion classification model via Hugging Face API
  */
 
 import { MOOD_CATEGORIES } from './constants';
 
-// Mapping of sentiment scores to mood categories
-const sentimentToMoodMap = {
-  'very_negative': MOOD_CATEGORIES.SAD,
-  'negative': MOOD_CATEGORIES.ANXIOUS,
-  'neutral': MOOD_CATEGORIES.FOCUSED,
-  'positive': MOOD_CATEGORIES.HAPPY,
-  'very_positive': MOOD_CATEGORIES.ENERGETIC
-};
-
-// Advanced keywords for better contextual matching
-const moodKeywords = {
-  [MOOD_CATEGORIES.ANXIOUS]: [
-    'anxious', 'nervous', 'worried', 'stress', 'stressed', 'panic', 'fear', 'scared',
-    'uneasy', 'apprehensive', 'jittery', 'tense', 'frightened', 'concerned',
-    'anxiety', 'uncertainty', 'dread', 'agitated', 'restless', 'insecure'
-  ],
-  [MOOD_CATEGORIES.CALM]: [
-    'calm', 'peaceful', 'relaxed', 'serene', 'tranquil', 'content', 'ease', 'meditation',
-    'quiet', 'still', 'composed', 'collected', 'untroubled', 'placid', 'zen',
-    'steady', 'mellow', 'cool', 'unruffled', 'stable', 'balanced'
-  ],
-  [MOOD_CATEGORIES.HAPPY]: [
-    'happy', 'joy', 'cheerful', 'excited', 'glad', 'pleased', 'delighted', 'thrilled',
-    'optimistic', 'elated', 'jubilant', 'ecstatic', 'upbeat', 'cheery', 'blissful',
-    'gleeful', 'jolly', 'lively', 'positive', 'satisfied', 'content', 'good mood'
-  ],
-  [MOOD_CATEGORIES.SAD]: [
-    'sad', 'down', 'unhappy', 'miserable', 'depressed', 'gloomy', 'blue', 'melancholy', 
-    'upset', 'heartbroken', 'sorrowful', 'dejected', 'downcast', 'downhearted', 'grieving',
-    'mournful', 'tearful', 'despondent', 'disheartened', 'troubled', 'heavy-hearted'
-  ],
-  [MOOD_CATEGORIES.ENERGETIC]: [
-    'energy', 'energetic', 'pumped', 'active', 'vigorous', 'lively', 'dynamic', 'vibrant', 
-    'workout', 'motivated', 'invigorated', 'spirited', 'enthusiastic', 'peppy', 'animated',
-    'vivacious', 'exuberant', 'fired up', 'full of life', 'zestful', 'eager'
-  ],
-  [MOOD_CATEGORIES.STUDY]: [
-    'study', 'focus', 'concentration', 'homework', 'learning', 'reading', 'exam', 'test',
-    'productive', 'academic', 'intellectual', 'scholarly', 'educational', 'research',
-    'analytical', 'thoughtful', 'contemplative', 'reflective', 'absorbed', 'engrossed'
-  ],
-  [MOOD_CATEGORIES.SOOTHING]: [
-    'soothe', 'soothing', 'comfort', 'gentle', 'soft', 'relax', 'sleep', 'dream', 'cozy',
-    'comforting', 'restful', 'calming', 'healing', 'therapeutic', 'pacifying',
-    'lulling', 'consoling', 'reassuring', 'nurturing', 'warm', 'secure'
-  ],
-  [MOOD_CATEGORIES.ANGRY]: [
-    'angry', 'mad', 'furious', 'rage', 'annoyed', 'irritated', 'frustrated', 'upset', 'hate',
-    'irate', 'enraged', 'infuriated', 'outraged', 'livid', 'seething', 'incensed', 
-    'indignant', 'vexed', 'cross', 'bitter', 'heated', 'hostile'
-  ],
-  [MOOD_CATEGORIES.FOCUSED]: [
-    'focused', 'determined', 'resolute', 'committed', 'attentive', 'dedicated', 'concentrate',
-    'mindful', 'intent', 'diligent', 'steadfast', 'precise', 'alert', 'sharp',
-    'disciplined', 'purposeful', 'driven', 'single-minded', 'unwavering', 'persistent'
-  ]
-};
-
 /**
- * Basic local mood detection as fallback
- * @param {string} text - User input text
- * @returns {string} Detected mood category
- */
-const detectMoodLocally = (text) => {
-  if (!text || typeof text !== 'string') {
-    return MOOD_CATEGORIES.HAPPY; // Default fallback
-  }
-
-  const lowercaseText = text.toLowerCase();
-  
-  let bestMatch = null;
-  let highestMatchCount = 0;
-  
-  Object.entries(moodKeywords).forEach(([mood, keywords]) => {
-    let matchCount = 0;
-    
-    keywords.forEach(keyword => {
-      if (lowercaseText.includes(keyword)) {
-        matchCount++;
-      }
-    });
-    
-    if (matchCount > highestMatchCount) {
-      highestMatchCount = matchCount;
-      bestMatch = mood;
-    }
-  });
-  
-  return bestMatch || MOOD_CATEGORIES.HAPPY;
-};
-
-/**
- * Call Mistral AI API via Hugging Face Space for mood analysis
+ * Call Hartmann AI API via Hugging Face Space for mood analysis
  * @param {string} text - User's chat message
  * @returns {Promise<Object|null>} API response or null on failure
  */
-const callAiApi = async (text) => {
-  // URL of your Hugging Face Space API endpoint
+const callHartmannAI = async (text) => {
   const apiUrl = 'https://huggingface.co/spaces/Leofrmamzn/moodify-mood-detection/api/predict';
   
   try {
-    // Set a timeout to prevent hanging if the API is slow
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
     
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -127,51 +34,78 @@ const callAiApi = async (text) => {
     
     const result = await response.json();
     
-    // Parse the JSON string from the API response
+    // Parse the JSON response from Hartmann model
     if (result && result.data && result.data[0]) {
       const moodData = JSON.parse(result.data[0]);
       
-      // Check if we received a valid mood
       if (moodData && moodData.mood) {
         return {
           success: true,
-          dominantEmotions: moodData.mood.toLowerCase(),
-          confidence: 0.9
+          mood: moodData.mood.toLowerCase(),
+          confidence: moodData.confidence || 0.8,
+          detectedEmotion: moodData.detected_emotion || 'unknown'
         };
       }
     }
     
-    throw new Error('Invalid response format from API');
+    throw new Error('Invalid response format from Hartmann AI');
   } catch (error) {
-    console.error('Error calling Mood Detection API:', error);
+    console.error('Error calling Hartmann AI:', error);
     return null;
   }
 };
 
 /**
- * Detects mood from chat conversation
+ * Simple fallback mood detection for offline/error scenarios
+ * @param {string} text - User input text
+ * @returns {string} Detected mood category
+ */
+const detectMoodFallback = (text) => {
+  if (!text || typeof text !== 'string') {
+    return MOOD_CATEGORIES.HAPPY;
+  }
+
+  const lowercaseText = text.toLowerCase();
+  
+  // Basic keyword matching as fallback
+  const simpleKeywords = {
+    [MOOD_CATEGORIES.HAPPY]: ['happy', 'joy', 'cheerful', 'excited', 'good', 'great'],
+    [MOOD_CATEGORIES.SAD]: ['sad', 'down', 'unhappy', 'depressed', 'upset'],
+    [MOOD_CATEGORIES.ANGRY]: ['angry', 'mad', 'furious', 'annoyed', 'frustrated'],
+    [MOOD_CATEGORIES.ANXIOUS]: ['anxious', 'nervous', 'worried', 'stress', 'scared'],
+    [MOOD_CATEGORIES.CALM]: ['calm', 'peaceful', 'relaxed', 'serene'],
+    [MOOD_CATEGORIES.ENERGETIC]: ['energetic', 'pumped', 'active', 'motivated'],
+    [MOOD_CATEGORIES.STUDY]: ['study', 'focus', 'learning', 'homework'],
+    [MOOD_CATEGORIES.SOOTHING]: ['tired', 'sleep', 'relax', 'comfort']
+  };
+  
+  for (const [mood, keywords] of Object.entries(simpleKeywords)) {
+    if (keywords.some(keyword => lowercaseText.includes(keyword))) {
+      return mood;
+    }
+  }
+  
+  return MOOD_CATEGORIES.HAPPY; // Default fallback
+};
+
+/**
+ * Main function: Detects mood from chat conversation using AI
  * @param {string} chatInput - User's message
  * @returns {Promise<string>} - Promise resolving to detected mood
  */
 export const detectMoodFromChat = async (chatInput) => {
   try {
-    // First, attempt to use the AI API
-    const aiResult = await callAiApi(chatInput);
+    // First, attempt to use Hartmann AI
+    const aiResult = await callHartmannAI(chatInput);
     
-    if (aiResult && aiResult.success) {
-      // If the API returned "dominant emotions", use those
-      if (aiResult.dominantEmotions) {
-        return aiResult.dominantEmotions;
-      }
-      
-      // Otherwise, map sentiment to mood
-      if (aiResult.sentiment && sentimentToMoodMap[aiResult.sentiment]) {
-        return sentimentToMoodMap[aiResult.sentiment];
-      }
+    if (aiResult && aiResult.success && aiResult.mood) {
+      console.log(`AI detected mood: ${aiResult.mood} (confidence: ${aiResult.confidence})`);
+      return aiResult.mood;
     }
     
-    // Fallback to local detection if API failed
-    return detectMoodLocally(chatInput);
+    // Fallback to simple detection if AI fails
+    console.log('AI failed, using fallback detection');
+    return detectMoodFallback(chatInput);
   } catch (error) {
     console.error('Error in chat mood detection:', error);
     return MOOD_CATEGORIES.HAPPY; // Safe fallback
