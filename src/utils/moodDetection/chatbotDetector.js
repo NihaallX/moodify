@@ -103,8 +103,7 @@ const detectMoodLocally = (text) => {
  */
 const callAiApi = async (text) => {
   // URL of your Hugging Face Space API endpoint
-  // Replace with your actual deployed space URL
-  const apiUrl = 'https://yourusername-moodify-mood-detection.hf.space/api/predict';
+  const apiUrl = 'https://huggingface.co/spaces/Leofrmamzn/moodify-mood-detection/api/predict';
   
   try {
     // Set a timeout to prevent hanging if the API is slow
