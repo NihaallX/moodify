@@ -6,47 +6,80 @@
 import { MOOD_CATEGORIES } from './constants';
 
 /**
- * Call Hartmann AI API via Hugging Face Space for mood analysis
+ * Call Hartmann AI API via Hugging Face Inference API (avoids CORS issues)
  * @param {string} text - User's chat message
  * @returns {Promise<Object|null>} API response or null on failure
  */
 const callHartmannAI = async (text) => {
-  const apiUrl = 'https://huggingface.co/spaces/Leofrmamzn/moodify-mood-detection/api/predict';
+  // Use Hugging Face Inference API directly - no CORS issues
+  const apiUrl = 'https://api-inference.huggingface.co/models/j-hartmann/emotion-english-distilroberta-base';
   
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout for model loading
     
     const response = await fetch(apiUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Authorization': `Bearer ${process.env.REACT_APP_HUGGINGFACE_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
-        data: [text]
+        inputs: text
       }),
       signal: controller.signal
     });
     
     clearTimeout(timeoutId);
     
-    if (!response.ok) {
-      throw new Error(`API returned status code ${response.status}`);
-    }
+    console.log('Response status:', response.status);
+    console.log('Response ok:', response.ok);
     
     const result = await response.json();
-    console.log('API raw response:', result);
+    console.log('HF Inference API raw response:', result);
+    console.log('Response type:', typeof result);
+    console.log('Is array:', Array.isArray(result));
     
-    // Parse the JSON response from Hartmann model
-    if (result && result.data && result.data[0]) {
-      console.log('API data[0]:', result.data[0]);
-      const moodData = JSON.parse(result.data[0]);
-      console.log('Parsed mood data:', moodData);
+    // Handle model loading state
+    if (result.error && result.error.includes('loading')) {
+      console.log('Model is loading, trying again...');
+      throw new Error('Model is loading, please try again');
+    }
+    
+    if (!response.ok) {
+      console.log('API Error:', result);
+      throw new Error(`API returned status code ${response.status}: ${result.error || 'Unknown error'}`);
+    }
+    
+    // Parse the response from Hugging Face Inference API
+    // Format: [{ "label": "joy", "score": 0.9 }, { "label": "sadness", "score": 0.1 }, ...]
+    if (result && Array.isArray(result) && result.length > 0) {
+      // Find the emotion with highest confidence
+      const topEmotion = result.reduce((prev, current) => 
+        (prev.score > current.score) ? prev : current
+      );
       
-      if (moodData && moodData.mood) {
+      console.log('Top emotion:', topEmotion);
+      
+      // Map AI emotion to Moodify mood categories
+      const emotionToMoodMap = {
+        "joy": "happy",
+        "sadness": "sad", 
+        "anger": "angry",
+        "fear": "anxious",
+        "surprise": "energetic",
+        "disgust": "angry"
+      };
+      
+      // Safe access to label property
+      if (topEmotion && topEmotion.label) {
+        const detectedMood = emotionToMoodMap[topEmotion.label.toLowerCase()] || "neutral";
+        
         return {
           success: true,
-          mood: moodData.mood.toLowerCase(),
-          confidence: moodData.confidence || 0.8,
-          detectedEmotion: moodData.detected_emotion || 'unknown'
+          mood: detectedMood,
+          confidence: topEmotion.score,
+          detectedEmotion: topEmotion.label
         };
       }
     }
