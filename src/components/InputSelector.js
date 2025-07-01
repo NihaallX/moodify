@@ -18,7 +18,7 @@ function InputSelector({ activeInput, onInputChange }) {
           onClick={() => onInputChange(DETECTION_TYPES.CHAT)}
         >
           <span className="input-icon">💬</span>
-          <span className="input-label">AI Chat</span>
+          <span className="input-label">AI Chat <span className="experimental-label">👨‍🔬 experimental</span></span>
         </button>
       </div>
     </div>
