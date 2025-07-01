@@ -10,6 +10,7 @@ import SpotifyLoginButton from './components/SpotifyLoginButton';
 import SpotifyCallback from './components/SpotifyCallback';
 import UserProfile from './components/UserProfile';
 import LocalDevAuth from './components/LocalDevAuth';
+import ReviewForm from './components/ReviewForm';
 import { detectMood } from './utils/moodDetection';
 import { DETECTION_TYPES } from './utils/moodDetection/constants';
 import spotifyService from './services/spotifyService';
@@ -21,6 +22,7 @@ function App() {
   const [lastInput, setLastInput] = useState(null);
   const [lastInputType, setLastInputType] = useState(null);
   const [activeInputMode, setActiveInputMode] = useState(DETECTION_TYPES.EMOJI); // Default to emoji mode
+  const [showReviewForm, setShowReviewForm] = useState(false);
 
   useEffect(() => {
     // Check if user is logged in on component mount
@@ -92,22 +94,30 @@ function App() {
       <div className="App">
         <div className="dev-banner">
           🚀 Want full access? 🎧 Shoot a message to <a href="mailto:nihalpardeshi12344@gmail.com">nihalpardeshi12344@gmail.com</a> for VIP access
+        </div>      <header className="App-header">
+        <div className="logo-container">
+          <img 
+            src={`${process.env.PUBLIC_URL}/images/moodify-logo.png`} 
+            alt="Moodify Logo" 
+            className="logo" 
+          />
         </div>
-        <header className="App-header">
-          <div className="logo-container">
-            <img 
-              src={`${process.env.PUBLIC_URL}/images/moodify-logo.png`} 
-              alt="Moodify Logo" 
-              className="logo" 
-            />
-          </div>
-          <h1>Moodify</h1>
-          <p className="App-subtitle">Music recommendations based on your mood</p>
+        <h1>Moodify</h1>
+        <p className="App-subtitle">Music recommendations based on your mood</p>
+        <div className="header-actions">
           {isAuthenticated ? (
             <UserProfile onLogout={handleLogout} />
           ) : (
             <SpotifyLoginButton />
           )}
+          <button 
+            className="review-button-header"
+            onClick={() => setShowReviewForm(true)}
+            title="Leave a review ✨"
+          >
+            ✨ Review
+          </button>
+        </div>
       </header>
       
       {!isAuthenticated && process.env.NODE_ENV === 'development' && (
@@ -204,6 +214,11 @@ function App() {
           <p className="made-with-love">Made with ❤️ by Nihal</p>
         </div>
       </footer>
+      
+      <ReviewForm 
+        isOpen={showReviewForm}
+        onClose={() => setShowReviewForm(false)}
+      />
     </div>
     );
   };
