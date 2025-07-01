@@ -21,7 +21,7 @@ const callHartmannAI = async (text) => {
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: { 
-        'Authorization': `Bearer ${process.env.REACT_APP_HUGGINGFACE_TOKEN}`,
+        'Authorization': `Bearer ${process.env.REACT_APP_HUGGINGFACE_TOKEN || ''}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -32,19 +32,8 @@ const callHartmannAI = async (text) => {
     
     clearTimeout(timeoutId);
     
-    console.log('Response status:', response.status);
-    console.log('Response ok:', response.ok);
-    
     const result = await response.json();
     console.log('HF Inference API raw response:', result);
-    console.log('Response type:', typeof result);
-    console.log('Is array:', Array.isArray(result));
-    
-    // Handle model loading state
-    if (result.error && result.error.includes('loading')) {
-      console.log('Model is loading, trying again...');
-      throw new Error('Model is loading, please try again');
-    }
     
     if (!response.ok) {
       console.log('API Error:', result);
