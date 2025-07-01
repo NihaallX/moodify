@@ -11,6 +11,13 @@ import { MOOD_CATEGORIES } from './constants';
  * @returns {Promise<Object|null>} API response or null on failure
  */
 const callHartmannAI = async (text) => {
+  // Check if token is available
+  const token = process.env.REACT_APP_HUGGINGFACE_TOKEN;
+  if (!token || token.trim() === '') {
+    console.log('Hugging Face token not available, skipping AI detection');
+    return null;
+  }
+  
   // Use Hugging Face Inference API directly - no CORS issues
   const apiUrl = 'https://api-inference.huggingface.co/models/j-hartmann/emotion-english-distilroberta-base';
   
@@ -21,7 +28,7 @@ const callHartmannAI = async (text) => {
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: { 
-        'Authorization': `Bearer ${process.env.REACT_APP_HUGGINGFACE_TOKEN || ''}`,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -37,16 +44,44 @@ const callHartmannAI = async (text) => {
     
     if (!response.ok) {
       console.log('API Error:', result);
+      // Don't throw error for auth issues, just return null to use fallback
+      if (response.status === 401 || response.status === 403) {
+        console.log('Authentication failed, falling back to simple detection');
+        return null;
+      }
       throw new Error(`API returned status code ${response.status}: ${result.error || 'Unknown error'}`);
     }
     
     // Parse the response from Hugging Face Inference API
-    // Format: [{ "label": "joy", "score": 0.9 }, { "label": "sadness", "score": 0.1 }, ...]
-    if (result && Array.isArray(result) && result.length > 0) {
+    // Handle different response formats gracefully
+    console.log('Parsing AI response:', typeof result, result);
+    
+    let emotions = [];
+    
+    // Handle array response format: [{ "label": "joy", "score": 0.9 }, ...]
+    if (Array.isArray(result)) {
+      emotions = result;
+    }
+    // Handle nested array format: [[{ "label": "joy", "score": 0.9 }, ...]]
+    else if (result && Array.isArray(result[0])) {
+      emotions = result[0];
+    }
+    // Handle object with emotions array
+    else if (result && result.emotions && Array.isArray(result.emotions)) {
+      emotions = result.emotions;
+    }
+    // Handle single emotion object
+    else if (result && result.label && typeof result.score === 'number') {
+      emotions = [result];
+    }
+    
+    if (emotions.length > 0) {
       // Find the emotion with highest confidence
-      const topEmotion = result.reduce((prev, current) => 
-        (prev.score > current.score) ? prev : current
-      );
+      const topEmotion = emotions.reduce((prev, current) => {
+        const prevScore = typeof prev.score === 'number' ? prev.score : 0;
+        const currentScore = typeof current.score === 'number' ? current.score : 0;
+        return prevScore > currentScore ? prev : current;
+      });
       
       console.log('Top emotion:', topEmotion);
       
@@ -61,19 +96,21 @@ const callHartmannAI = async (text) => {
       };
       
       // Safe access to label property
-      if (topEmotion && topEmotion.label) {
-        const detectedMood = emotionToMoodMap[topEmotion.label.toLowerCase()] || "neutral";
+      if (topEmotion && topEmotion.label && typeof topEmotion.label === 'string') {
+        const detectedMood = emotionToMoodMap[topEmotion.label.toLowerCase()] || "happy";
         
         return {
           success: true,
           mood: detectedMood,
-          confidence: topEmotion.score,
+          confidence: topEmotion.score || 0.5,
           detectedEmotion: topEmotion.label
         };
       }
     }
     
-    throw new Error('Invalid response format from Hartmann AI');
+    // If parsing fails, return a graceful fallback instead of throwing
+    console.log('Could not parse AI response, using fallback');
+    return null;
   } catch (error) {
     console.error('Error calling Hartmann AI:', error);
     return null;
