@@ -17,7 +17,13 @@ A mood-based music recommendation web application that suggests Spotify playlist
 
 - **Frontend**: React with plain CSS
 - **External APIs**: Prepared for Spotify API integration
-- **Mood Detection**: Simple keyword matching (expandable to NLP/ML)
+- **Mood Detection**: 
+  - Emoji Slider: Simple valence-arousal mood mapping
+  - AI Chat: Uses Mistral-based sentiment analysis (experimental)
+
+## AI Mood Detection (Experimental)
+
+This version uses SST-2 sentiment analysis — great for quick demos but limited to binary emotions. A future version will use multi-label emotion classification for more nuanced mood analysis. The current model works best with clear, direct statements about feelings and may not capture complex emotional states.
 
 ## Getting Started
 
