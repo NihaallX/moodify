@@ -60,11 +60,14 @@ const callHartmannAI = async (text) => {
     
     // Handle array response format: [{ "label": "joy", "score": 0.9 }, ...]
     if (Array.isArray(result)) {
-      emotions = result;
-    }
-    // Handle nested array format: [[{ "label": "joy", "score": 0.9 }, ...]]
-    else if (result && Array.isArray(result[0])) {
-      emotions = result[0];
+      // Check if it's a direct array of emotions
+      if (result.length > 0 && result[0].label && typeof result[0].score === 'number') {
+        emotions = result;
+      }
+      // Handle nested array format: [[{ "label": "joy", "score": 0.9 }, ...]]
+      else if (result.length > 0 && Array.isArray(result[0])) {
+        emotions = result[0];
+      }
     }
     // Handle object with emotions array
     else if (result && result.emotions && Array.isArray(result.emotions)) {
@@ -75,7 +78,9 @@ const callHartmannAI = async (text) => {
       emotions = [result];
     }
     
-    if (emotions.length > 0) {
+    console.log('Parsed emotions array:', emotions);
+    
+    if (emotions.length > 0 && emotions[0].label) {
       // Find the emotion with highest confidence
       const topEmotion = emotions.reduce((prev, current) => {
         const prevScore = typeof prev.score === 'number' ? prev.score : 0;
@@ -83,7 +88,7 @@ const callHartmannAI = async (text) => {
         return prevScore > currentScore ? prev : current;
       });
       
-      console.log('Top emotion:', topEmotion);
+      console.log('Top emotion (parsed correctly):', topEmotion);
       
       // Map AI emotion to Moodify mood categories
       const emotionToMoodMap = {
