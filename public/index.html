@@ -9,39 +9,6 @@
       name="description"
       content="Moodify - Mood-based music recommendations"
     />
-    <!-- Always redirect to landing page unless coming from there -->
-    <script>
-      // Check if we're on GitHub Pages
-      if (window.location.hostname.includes('github.io') && 
-          !window.location.hash && 
-          !sessionStorage.getItem('from-landing-page')) {
-        window.location.href = './landing.html';
-      }
-    </script>
-    <!-- Start Single Page Apps for GitHub Pages -->
-    <script type="text/javascript">
-      // Single Page Apps for GitHub Pages
-      // MIT License
-      // https://github.com/rafgraph/spa-github-pages
-      (function(l) {
-        // Handle the search query for hash router
-        if (l.search[1] === '/' ) {
-          var decoded = l.search.slice(1).split('&').map(function(s) { 
-            return s.replace(/~and~/g, '&')
-          }).join('?');
-          window.history.replaceState(null, null,
-              l.pathname.slice(0, -1) + '#' + decoded + l.hash
-          );
-        }
-        
-        // Handle direct access to routes for hash router
-        if (l.pathname.includes('/moodify/') && !l.pathname.endsWith('/moodify/') && !l.pathname.endsWith('/moodify')) {
-          var pathToRedirect = l.pathname.replace('/moodify/', '/moodify/#/');
-          l.replace(pathToRedirect + (l.search || '') + (l.hash || ''));
-        }
-      }(window.location))
-    </script>
-    <!-- End Single Page Apps for GitHub Pages -->
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
