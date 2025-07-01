@@ -21,9 +21,54 @@ A mood-based music recommendation web application that suggests Spotify playlist
   - Emoji Slider: Simple valence-arousal mood mapping
   - AI Chat: Uses Mistral-based sentiment analysis (experimental)
 
-## AI Mood Detection (Experimental)
+## AI Mood Detection
 
-This version uses SST-2 sentiment analysis — great for quick demos but limited to binary emotions. A future version will use multi-label emotion classification for more nuanced mood analysis. The current model works best with clear, direct statements about feelings and may not capture complex emotional states.
+This application now features advanced AI-powered mood detection using the Hartmann emotion-english-distilroberta-base model (DistilBERT for Emotion Classification). The AI can detect multiple emotions from text input with high accuracy.
+
+### Supported Emotions
+- Joy / Happiness
+- Sadness
+- Anger
+- Fear
+- Surprise
+- Disgust / Contempt
+- And more nuanced emotional states
+
+### Environment Variables
+
+For local development, copy `.env.example` to `.env` and add your tokens:
+
+```bash
+cp .env.example .env
+```
+
+Then edit `.env` and add your Hugging Face API token:
+```
+REACT_APP_HUGGINGFACE_TOKEN=your_huggingface_token_here
+```
+
+You can get a free Hugging Face API token from [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens).
+
+## Deployment
+
+The application is automatically deployed to GitHub Pages using GitHub Actions. The deployment workflow:
+
+1. **Triggers**: On push to `master` branch or manual workflow dispatch
+2. **Build**: Installs dependencies and builds the React app with environment variables
+3. **Deploy**: Uses official GitHub Pages actions for secure deployment
+
+### GitHub Pages Setup
+
+The repository is configured for GitHub Pages deployment:
+- **Source**: GitHub Actions
+- **Custom Domain**: Not configured (uses default GitHub Pages URL)
+- **Environment Variables**: Stored as GitHub repository secrets
+
+### Environment Variables for Production
+
+Add the following secrets to your GitHub repository (Settings → Secrets and variables → Actions):
+
+- `REACT_APP_HUGGINGFACE_TOKEN`: Your Hugging Face API token
 
 ## Getting Started
 
