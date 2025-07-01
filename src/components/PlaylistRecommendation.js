@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import './PlaylistRecommendation.css';
 import PlaylistCard from './PlaylistCard';
+import PlaylistFeedback from './PlaylistFeedback';
 import spotifyService from '../services/spotifyService';
 
 function PlaylistRecommendation({ mood }) {
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  const handleFeedbackSubmit = (feedbackType, comment) => {
+    console.log(`Playlist feedback: ${feedbackType} for mood: ${mood}`);
+    if (comment) {
+      console.log(`User comment: ${comment}`);
+    }
+    // Could add analytics tracking here in the future
+  };
   
   useEffect(() => {
     const fetchPlaylists = async () => {
@@ -247,6 +256,14 @@ function PlaylistRecommendation({ mood }) {
           />
         ))}
       </div>
+      
+      {/* Add feedback component after playlists */}
+      {!loading && displayPlaylists.length > 0 && (
+        <PlaylistFeedback 
+          mood={mood}
+          onFeedbackSubmit={handleFeedbackSubmit}
+        />
+      )}
       
       {spotifyService.isLoggedIn() ? (
         <div className="spotify-note">

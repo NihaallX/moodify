@@ -91,13 +91,14 @@ const callHartmannAI = async (text) => {
       console.log('Top emotion (parsed correctly):', topEmotion);
       
       // Map AI emotion to Moodify mood categories
+      // Note: Hartmann model only detects 6 basic emotions: joy, sadness, anger, fear, surprise, disgust
       const emotionToMoodMap = {
         "joy": "happy",
         "sadness": "sad", 
         "anger": "angry",
         "fear": "anxious",
-        "surprise": "energetic",
-        "disgust": "angry"
+        "surprise": "energetic", // Could be happy too, but energetic fits better
+        "disgust": "angry" // Disgust often correlates with anger/irritation
       };
       
       // Safe access to label property
@@ -134,16 +135,129 @@ const detectMoodFallback = (text) => {
 
   const lowercaseText = text.toLowerCase();
   
-  // Basic keyword matching as fallback
+  // Enhanced keyword matching with expanded vocabulary
   const simpleKeywords = {
-    [MOOD_CATEGORIES.HAPPY]: ['happy', 'joy', 'cheerful', 'excited', 'good', 'great'],
-    [MOOD_CATEGORIES.SAD]: ['sad', 'down', 'unhappy', 'depressed', 'upset'],
-    [MOOD_CATEGORIES.ANGRY]: ['angry', 'mad', 'furious', 'annoyed', 'frustrated'],
-    [MOOD_CATEGORIES.ANXIOUS]: ['anxious', 'nervous', 'worried', 'stress', 'scared'],
-    [MOOD_CATEGORIES.CALM]: ['calm', 'peaceful', 'relaxed', 'serene'],
-    [MOOD_CATEGORIES.ENERGETIC]: ['energetic', 'pumped', 'active', 'motivated'],
-    [MOOD_CATEGORIES.STUDY]: ['study', 'focus', 'learning', 'homework'],
-    [MOOD_CATEGORIES.SOOTHING]: ['tired', 'sleep', 'relax', 'comfort']
+    [MOOD_CATEGORIES.HAPPY]: [
+      // Basic happy words
+      'happy', 'joy', 'joyful', 'cheerful', 'excited', 'good', 'great', 'amazing', 'awesome', 'fantastic',
+      'wonderful', 'excellent', 'brilliant', 'superb', 'delighted', 'thrilled', 'elated', 'ecstatic',
+      'overjoyed', 'jubilant', 'euphoric', 'blissful', 'content', 'satisfied', 'pleased', 'glad',
+      
+      // Modern/slang expressions
+      'fire', 'lit', 'vibing', 'blessed', 'winning', 'crushing', 'killing it', 'on top', 'pumped',
+      'stoked', 'hyped', 'buzzing', 'flying high', 'on cloud nine', 'over the moon', 'living my best life',
+      
+      // Emotional states
+      'optimistic', 'positive', 'upbeat', 'bright', 'sunny', 'radiant', 'glowing', 'beaming',
+      'cheerful', 'merry', 'lively', 'spirited', 'buoyant', 'uplifted', 'energized'
+    ],
+    
+    [MOOD_CATEGORIES.SAD]: [
+      // Basic sad words
+      'sad', 'down', 'unhappy', 'depressed', 'upset', 'blue', 'low', 'gloomy', 'miserable',
+      'heartbroken', 'devastated', 'crushed', 'broken', 'hurt', 'pain', 'ache', 'grief',
+      'sorrow', 'melancholy', 'despair', 'hopeless', 'defeated', 'discouraged', 'disappointed',
+      
+      // Modern expressions
+      'feeling down', 'bummed out', 'down in the dumps', 'feeling blue', 'not okay', 'struggling',
+      'going through it', 'having a rough time', 'not vibing', 'feeling off', 'down bad',
+      
+      // Emotional states
+      'lonely', 'empty', 'numb', 'hollow', 'lost', 'confused', 'overwhelmed', 'drained',
+      'weary', 'exhausted emotionally', 'tearful', 'crying', 'sobbing', 'weeping'
+    ],
+    
+    [MOOD_CATEGORIES.ANGRY]: [
+      // Basic angry words
+      'angry', 'mad', 'furious', 'annoyed', 'frustrated', 'irritated', 'pissed', 'rage',
+      'enraged', 'livid', 'irate', 'outraged', 'infuriated', 'incensed', 'seething',
+      'boiling', 'fuming', 'steaming', 'heated', 'agitated', 'aggravated', 'vexed',
+      
+      // Modern expressions
+      'pissed off', 'ticked off', 'fed up', 'had enough', 'done with', 'over it', 'triggered',
+      'seeing red', 'losing it', 'about to snap', 'ready to explode', 'burning up',
+      
+      // Intensity levels
+      'slightly annoyed', 'mildly irritated', 'really angry', 'absolutely furious',
+      'beyond angry', 'raging', 'volcanic', 'explosive', 'hostile', 'aggressive'
+    ],
+    
+    [MOOD_CATEGORIES.ANXIOUS]: [
+      // Basic anxious words
+      'anxious', 'nervous', 'worried', 'stress', 'stressed', 'scared', 'afraid', 'fearful',
+      'terrified', 'panicked', 'panic', 'anxiety', 'tension', 'uneasy', 'unsettled',
+      'restless', 'jittery', 'on edge', 'wound up', 'uptight', 'tense', 'frazzled',
+      
+      // Physical symptoms
+      'butterflies', 'racing heart', 'sweaty palms', 'shaking', 'trembling', 'nauseous',
+      'sick to stomach', 'dizzy', 'lightheaded', 'breathless', 'chest tight',
+      
+      // Modern expressions
+      'freaking out', 'losing my mind', 'going crazy', 'spiraling', 'overthinking',
+      'catastrophizing', 'worst case scenario', 'what if', 'can\'t handle', 'breaking down',
+      'having a meltdown', 'anxiety attack', 'panic attack', 'stress ball', 'wound tight'
+    ],
+    
+    [MOOD_CATEGORIES.CALM]: [
+      // Basic calm words
+      'calm', 'peaceful', 'relaxed', 'serene', 'tranquil', 'quiet', 'still', 'centered',
+      'balanced', 'composed', 'collected', 'cool', 'mellow', 'laid back', 'chill',
+      'zen', 'meditative', 'mindful', 'present', 'grounded', 'stable', 'steady',
+      
+      // Modern expressions
+      'chilling', 'chilled out', 'taking it easy', 'going with the flow', 'no worries',
+      'all good', 'at peace', 'in my element', 'feeling zen', 'totally relaxed',
+      
+      // States of being
+      'content', 'satisfied', 'at ease', 'comfortable', 'secure', 'safe', 'protected',
+      'harmony', 'equilibrium', 'inner peace', 'serenity', 'tranquility'
+    ],
+    
+    [MOOD_CATEGORIES.ENERGETIC]: [
+      // Basic energetic words
+      'energetic', 'pumped', 'active', 'motivated', 'driven', 'dynamic', 'vibrant',
+      'lively', 'spirited', 'animated', 'enthusiastic', 'vigorous', 'powerful',
+      'strong', 'charged', 'electric', 'explosive', 'intense', 'passionate',
+      
+      // Modern expressions
+      'amped up', 'fired up', 'ready to go', 'full of energy', 'bouncing off walls',
+      'hyper', 'wired', 'buzzed', 'high energy', 'full throttle', 'go mode',
+      'beast mode', 'power mode', 'unstoppable', 'on fire', 'crushing it',
+      
+      // Activity-related
+      'workout', 'exercise', 'run', 'dance', 'move', 'action', 'adventure',
+      'thrill', 'rush', 'adrenaline', 'pump', 'boost', 'surge'
+    ],
+    
+    [MOOD_CATEGORIES.STUDY]: [
+      // Basic study words
+      'study', 'studying', 'focus', 'focused', 'learning', 'homework', 'assignment',
+      'exam', 'test', 'quiz', 'research', 'reading', 'writing', 'work', 'working',
+      'concentration', 'concentrate', 'academic', 'school', 'university', 'college',
+      
+      // Modern expressions
+      'grinding', 'hitting the books', 'cramming', 'pulling an all-nighter',
+      'study mode', 'deep work', 'flow state', 'in the zone', 'locked in',
+      
+      // Mental states
+      'analytical', 'thoughtful', 'contemplative', 'reflective', 'intellectual',
+      'cerebral', 'mental', 'cognitive', 'processing', 'absorbing', 'retaining'
+    ],
+    
+    [MOOD_CATEGORIES.SOOTHING]: [
+      // Basic soothing words
+      'tired', 'sleepy', 'exhausted', 'drained', 'weary', 'worn out', 'fatigued',
+      'drowsy', 'yawning', 'need rest', 'need sleep', 'comfort', 'cozy', 'warm',
+      'soft', 'gentle', 'tender', 'nurturing', 'healing', 'recovery', 'restore',
+      
+      // Modern expressions
+      'dead tired', 'wiped out', 'running on empty', 'need to recharge', 'battery low',
+      'need downtime', 'self care', 'me time', 'wind down', 'decompress',
+      
+      // Comfort seeking
+      'cuddle', 'snuggle', 'blanket', 'tea', 'bath', 'massage', 'spa', 'retreat',
+      'sanctuary', 'refuge', 'haven', 'solace', 'soothe', 'comfort food'
+    ]
   };
   
   for (const [mood, keywords] of Object.entries(simpleKeywords)) {
