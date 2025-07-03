@@ -95,6 +95,11 @@ function App() {
         <div className="dev-banner">
           🚀 Want full access? 🎧 Shoot a message to <a href="mailto:nihalpardeshi12344@gmail.com">nihalpardeshi12344@gmail.com</a> for VIP access
         </div>      <header className="App-header">
+        <div className="landing-link">
+          <a href="/landing.html" className="back-to-landing-btn">
+            <i className="fa fa-arrow-left"></i> Back to Landing Page
+          </a>
+        </div>
         <div className="logo-container">
           <img 
             src={`${process.env.PUBLIC_URL}/images/moodify-logo.png`} 
