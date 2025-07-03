@@ -48,7 +48,7 @@ body {
 
 .landing-link {
   position: absolute;
-  top: 15px;
+  top: 60px; /* Moved down below the banner */
   left: 15px;
   z-index: 10;
 }
@@ -57,22 +57,23 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.25);
   color: white;
-  padding: 8px 16px;
+  padding: 10px 18px;
   border-radius: 20px;
   text-decoration: none;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .back-to-landing-btn:hover {
-  background-color: rgba(255, 255, 255, 0.3);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  background-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
 }
 
 .back-to-landing-btn i {
