@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import MoodInput from './components/MoodInput';
 import ChatInput from './components/ChatInput';
@@ -223,31 +223,11 @@ function App() {
     );
   };
   
-  // More comprehensive check for callback parameters
+  // Check for Spotify callback parameters in URL
   const hasCallbackParams = () => {
-    // Check in query parameters
+    // Check in query parameters - this is all we need for BrowserRouter
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('code') && urlParams.has('state')) {
-      return true;
-    }
-    
-    // Check in hash (for HashRouter)
-    if (window.location.hash) {
-      // Check if hash contains a question mark
-      if (window.location.hash.includes('?')) {
-        const hashParams = new URLSearchParams(window.location.hash.substring(window.location.hash.indexOf('?')));
-        if (hashParams.has('code') && hashParams.has('state')) {
-          return true;
-        }
-      }
-      
-      // Check directly in hash (GitHub Pages specific)
-      if (window.location.hash.includes('code=') && window.location.hash.includes('state=')) {
-        return true;
-      }
-    }
-    
-    return false;
+    return urlParams.has('code') && urlParams.has('state');
   };
   
   return (
