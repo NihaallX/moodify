@@ -15,11 +15,11 @@ const spotifyApi = new SpotifyWebApi();
 
 // Spotify API configuration
 const SPOTIFY_API_CONFIG = {
-  clientId: 'da07c52d47084b189847adc9b915a3f5', // Your client ID from Spotify Developer Dashboard  // Use HTTPS redirect URI for both production and development to avoid insecure URI warnings
-  // Include trailing slash to match exactly what's in the Spotify Developer Dashboard
-  redirectUri: 'https://nihaallx.github.io/moodify/',
+  clientId: 'da07c52d47084b189847adc9b915a3f5', // Your client ID from Spotify Developer Dashboard  // Vercel deployment uses BrowserRouter so we can use proper routing
+  // Make sure this matches exactly what's in your Spotify Developer Dashboard
+  redirectUri: 'https://moodifyxd.vercel.app/callback',
   // For development testing, you can manually set this to an allowed URI from Spotify Dashboard
-  // For example: 'https://localhost:3000/callback' (if you set up HTTPS locally)
+  // For example: 'https://localhost:3000/callback'
   scopes: [
     'user-read-private',
     'user-read-email',

@@ -20,34 +20,12 @@ function SpotifyCallback() {
           throw new Error('Missing code verifier. Please try authenticating again.');
         }
         
-        // Check for parameters in the URL search string (query parameters)
+        // Get parameters from the URL search string (BrowserRouter standard approach)
         const searchParams = new URLSearchParams(window.location.search);
         if (searchParams.has('code') && searchParams.has('state')) {
           code = searchParams.get('code');
           state = searchParams.get('state');
           console.log("Found parameters in search string");
-        }
-        // Check for parameters in the hash fragment (for HashRouter)
-        else if (window.location.hash) {
-          // First check if there's a question mark in the hash
-          if (window.location.hash.includes('?')) {
-            const hashParams = new URLSearchParams(window.location.hash.substring(window.location.hash.indexOf('?')));
-            if (hashParams.has('code') && hashParams.has('state')) {
-              code = hashParams.get('code');
-              state = hashParams.get('state');
-              console.log("Found parameters in hash fragment with ?");
-            }
-          } 
-          // Also check for direct inclusion in the hash (GitHib Pages specific issue)
-          else if (window.location.hash.includes('code=') && window.location.hash.includes('state=')) {
-            const hashContent = window.location.hash.substring(1); // Remove the # symbol
-            const params = new URLSearchParams(hashContent);
-            if (params.has('code') && params.has('state')) {
-              code = params.get('code');
-              state = params.get('state');
-              console.log("Found parameters directly in hash content");
-            }
-          }
         }
         
         // Final fallback to our utility function
