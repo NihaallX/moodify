@@ -46,6 +46,39 @@ body {
   text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
 }
 
+.landing-link {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  z-index: 10;
+}
+
+.back-to-landing-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.back-to-landing-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.back-to-landing-btn i {
+  font-size: 0.8rem;
+}
+
 .App-header {
   background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
   padding: 1.5rem;
