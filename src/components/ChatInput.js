@@ -1,12 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './ChatInput.css';
 import { DETECTION_TYPES } from '../utils/moodDetection/constants';
+import { generateFollowUpQuestion, detectPositiveIntent } from '../utils/moodDetection/conversationalReply';
 
-function ChatInput({ onMoodSubmit, lastInput }) {
+function ChatInput({ 
+  onMoodSubmit, 
+  lastInput, 
+  currentMood, 
+  conversationalReply, 
+  awaitingPlaylistConfirmation, 
+  onPlaylistConfirmation 
+}) {
   const [chatHistory, setChatHistory] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false); // Track API processing state
+  const [hasAddedFollowUp, setHasAddedFollowUp] = useState(false); // Track if follow-up question was added
   const chatEndRef = useRef(null);
 
   // Prepopulate with last input if available
@@ -27,6 +36,30 @@ function ChatInput({ onMoodSubmit, lastInput }) {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatHistory]);
 
+  // Add follow-up question when mood is detected and we're awaiting confirmation
+  useEffect(() => {
+    if (currentMood && conversationalReply && awaitingPlaylistConfirmation && !hasAddedFollowUp) {
+      const followUpQuestion = generateFollowUpQuestion(currentMood);
+      
+      const botMessage = {
+        text: followUpQuestion,
+        sender: 'bot',
+        timestamp: new Date().toISOString(),
+        isFollowUp: true
+      };
+      
+      setChatHistory(prev => [...prev, botMessage]);
+      setHasAddedFollowUp(true);
+    }
+  }, [currentMood, conversationalReply, awaitingPlaylistConfirmation, hasAddedFollowUp]);
+
+  // Reset chat state when parent resets
+  useEffect(() => {
+    if (!currentMood && !awaitingPlaylistConfirmation) {
+      setHasAddedFollowUp(false);
+    }
+  }, [currentMood, awaitingPlaylistConfirmation]);
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     
@@ -43,7 +76,32 @@ function ChatInput({ onMoodSubmit, lastInput }) {
     const userMessageText = currentMessage;
     setCurrentMessage('');
     
-    // Show typing indicator while processing mood
+    // Check if this is a response to a follow-up question
+    if (awaitingPlaylistConfirmation) {
+      // User is responding to playlist confirmation question
+      const wantsPlaylists = detectPositiveIntent(userMessageText);
+      
+      // Add bot response about their choice
+      const confirmationResponse = wantsPlaylists 
+        ? "Perfect! I'll pull up some great playlists for you right now. 🎵"
+        : "No worries! Feel free to chat with me anytime about how you're feeling. 😊";
+      
+      const botMessage = {
+        text: confirmationResponse,
+        sender: 'bot',
+        timestamp: new Date().toISOString(),
+        isConfirmation: true
+      };
+      
+      setChatHistory((prev) => [...prev, botMessage]);
+      
+      // Notify parent component about the user's decision
+      onPlaylistConfirmation(wantsPlaylists);
+      
+      return; // Don't process this as a new mood detection
+    }
+    
+    // This is initial mood detection
     setIsTyping(true);
     setIsProcessing(true);
     
@@ -73,25 +131,22 @@ function ChatInput({ onMoodSubmit, lastInput }) {
   const simulateResponse = () => {
     // Wait a brief moment to make the interaction feel more natural
     setTimeout(() => {
-      const botResponses = [
-        "I'll find music that matches your mood!",
-        "Let me find some tunes that might help with that.",
-        "I understand how you're feeling. Let's find you some music.",
-        "Thanks for sharing. I'll recommend some tracks based on your mood.",
-        "Got it! Finding the perfect playlist for your current state.",
-      ];
-      
-      const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
+      // Use conversational reply if available, otherwise use fallback
+      const responseText = conversationalReply || "I understand how you're feeling. Let me analyze that for you.";
       
       const botMessage = {
-        text: randomResponse,
+        text: responseText,
         sender: 'bot',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        isMoodResponse: true
       };
       
       setChatHistory((prev) => [...prev, botMessage]);
       setIsTyping(false);
       setIsProcessing(false);
+      
+      // Reset the follow-up state for next interaction
+      setHasAddedFollowUp(false);
     }, 800);
   };
 
@@ -141,7 +196,7 @@ function ChatInput({ onMoodSubmit, lastInput }) {
           type="text"
           value={currentMessage}
           onChange={(e) => setCurrentMessage(e.target.value)}
-          placeholder="How are you feeling today?"
+          placeholder={awaitingPlaylistConfirmation ? "Yes, please! or No thanks..." : "How are you feeling today?"}
           aria-label="Chat message"
           disabled={isProcessing}
         />

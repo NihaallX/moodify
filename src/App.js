@@ -26,6 +26,8 @@ function App() {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [conversationalReply, setConversationalReply] = useState(null); // New state for AI reply
   const [showContactModal, setShowContactModal] = useState(false); // New state for contact modal
+  const [awaitingPlaylistConfirmation, setAwaitingPlaylistConfirmation] = useState(false); // Track if waiting for user confirmation
+  const [shouldShowPlaylists, setShouldShowPlaylists] = useState(true); // Control playlist display
 
   useEffect(() => {
     // Check if user is logged in on component mount
@@ -74,11 +76,18 @@ function App() {
         // Two-layer chat detection returns an object
         setCurrentMood(detectionResult.mood);
         setConversationalReply(detectionResult.reply);
+        
+        // For chat mode, show follow-up question and wait for confirmation
+        setAwaitingPlaylistConfirmation(true);
+        setShouldShowPlaylists(false);
+        
         console.log(`Two-layer detection - Mood: ${detectionResult.mood}, Reply: ${detectionResult.reply}`);
       } else {
-        // Emoji detection returns a string
+        // Emoji detection returns a string - show playlists immediately
         setCurrentMood(detectionResult);
         setConversationalReply(null);
+        setAwaitingPlaylistConfirmation(false);
+        setShouldShowPlaylists(true);
         console.log(`Detected mood: ${detectionResult} from ${inputType} input`);
       }
     } catch (error) {
@@ -90,10 +99,17 @@ function App() {
     }
   };
   
+  const handlePlaylistConfirmation = (confirmed) => {
+    setAwaitingPlaylistConfirmation(false);
+    setShouldShowPlaylists(confirmed);
+  };
+  
   const handleReset = () => {
     setCurrentMood(null);
     setLastInput(null);
     setConversationalReply(null); // Reset reply as well
+    setAwaitingPlaylistConfirmation(false); // Reset confirmation state
+    setShouldShowPlaylists(true); // Reset playlist display
     // Keep the current active input mode instead of forcing emoji mode
     setLastInputType(activeInputMode);
   };
@@ -169,6 +185,10 @@ function App() {
             <ChatInput 
               onMoodSubmit={handleMoodSubmission}
               lastInput={lastInputType === DETECTION_TYPES.CHAT ? lastInput : null}
+              currentMood={currentMood}
+              conversationalReply={conversationalReply}
+              awaitingPlaylistConfirmation={awaitingPlaylistConfirmation}
+              onPlaylistConfirmation={handlePlaylistConfirmation}
             />
           )}
           
@@ -184,7 +204,7 @@ function App() {
           <div className="results-side">
             <div className="results-container">
               <MoodMessage mood={currentMood} conversationalReply={conversationalReply} />
-              <PlaylistRecommendation mood={currentMood} />
+              {shouldShowPlaylists && <PlaylistRecommendation mood={currentMood} />}
             </div>
           </div>
         )}
