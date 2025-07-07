@@ -80,7 +80,7 @@ const ContactModal = ({ isOpen, onClose }) => {
             <div className="contact-success">
               <div className="success-icon">🚀</div>
               <h3>Message Sent!</h3>
-              <p>Thanks for your interest! Nihal will get back to you soon.</p>
+              <p>Thanks for your interest! Nihaall will get back to you soon.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="contact-form">
