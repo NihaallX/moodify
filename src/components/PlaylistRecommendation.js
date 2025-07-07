@@ -248,6 +248,14 @@ function PlaylistRecommendation({ mood }) {
         </div>
       )}
       
+      {/* Add feedback component ABOVE playlists for better visibility */}
+      {!loading && displayPlaylists.length > 0 && (
+        <PlaylistFeedback 
+          mood={mood}
+          onFeedbackSubmit={handleFeedbackSubmit}
+        />
+      )}
+      
       <div className="playlists-container">
         {displayPlaylists.map(playlist => (
           <PlaylistCard 
@@ -256,14 +264,6 @@ function PlaylistRecommendation({ mood }) {
           />
         ))}
       </div>
-      
-      {/* Add feedback component after playlists */}
-      {!loading && displayPlaylists.length > 0 && (
-        <PlaylistFeedback 
-          mood={mood}
-          onFeedbackSubmit={handleFeedbackSubmit}
-        />
-      )}
       
       {spotifyService.isLoggedIn() ? (
         <div className="spotify-note">

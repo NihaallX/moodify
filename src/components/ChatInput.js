@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import './ChatInput.css';
 import { DETECTION_TYPES } from '../utils/moodDetection/constants';
 import { generateFollowUpQuestion, detectPositiveIntent } from '../utils/moodDetection/conversationalReply';
+import PlaylistFeedback from './PlaylistFeedback';
 
 function ChatInput({ 
   onMoodSubmit, 
@@ -16,6 +17,7 @@ function ChatInput({
   const [isTyping, setIsTyping] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false); // Track API processing state
   const [hasAddedFollowUp, setHasAddedFollowUp] = useState(false); // Track if follow-up question was added
+  const [showFloatingFeedback, setShowFloatingFeedback] = useState(false); // Track if floating feedback should show
   const chatEndRef = useRef(null);
 
   // Prepopulate with last input if available
@@ -65,12 +67,19 @@ function ChatInput({
   useEffect(() => {
     if (!currentMood && !awaitingPlaylistConfirmation) {
       setHasAddedFollowUp(false);
+      setShowFloatingFeedback(false); // Hide floating feedback on reset
       // Only clear chat history if lastInput is also null (complete reset)
       if (!lastInput) {
         setChatHistory([]);
       }
     }
   }, [currentMood, awaitingPlaylistConfirmation, lastInput]);
+
+  const handleFloatingFeedback = (feedbackType, comment) => {
+    console.log(`Floating feedback: ${feedbackType} for mood: ${currentMood}`, comment);
+    // Hide the floating feedback after submission
+    setShowFloatingFeedback(false);
+  };
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -107,6 +116,13 @@ function ChatInput({
       };
       
       setChatHistory((prev) => [...prev, botMessage]);
+      
+      // Show floating feedback if user wants playlists
+      if (wantsPlaylists) {
+        setTimeout(() => {
+          setShowFloatingFeedback(true);
+        }, 2000); // Show feedback after 2 seconds
+      }
       
       // Notify parent component about the user's decision
       onPlaylistConfirmation(wantsPlaylists);
@@ -240,6 +256,23 @@ function ChatInput({
           )}
         </button>
       </form>
+      
+      {/* Floating feedback component for chat mode */}
+      {showFloatingFeedback && currentMood && (
+        <div className="floating-feedback">
+          <button 
+            className="floating-feedback-close"
+            onClick={() => setShowFloatingFeedback(false)}
+            aria-label="Close feedback"
+          >
+            ×
+          </button>
+          <PlaylistFeedback 
+            mood={currentMood}
+            onFeedbackSubmit={handleFloatingFeedback}
+          />
+        </div>
+      )}
     </div>
   );
 }
