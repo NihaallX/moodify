@@ -203,7 +203,10 @@ function App() {
         {currentMood && !isLoading && (
           <div className="results-side">
             <div className="results-container">
-              <MoodMessage mood={currentMood} conversationalReply={conversationalReply} />
+              {/* Only show MoodMessage for emoji mode, since chat mode shows everything in the chatbox */}
+              {activeInputMode === DETECTION_TYPES.EMOJI && (
+                <MoodMessage mood={currentMood} conversationalReply={conversationalReply} />
+              )}
               {shouldShowPlaylists && <PlaylistRecommendation mood={currentMood} />}
             </div>
           </div>
