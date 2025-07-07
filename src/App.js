@@ -122,7 +122,7 @@ function App() {
         </div>
         <h1>Moodify</h1>
         <p className="App-subtitle">Music recommendations based on your mood</p>
-        <div className="header-actions">
+        <div className={`header-actions ${!isAuthenticated ? 'with-spotify-button' : ''}`}>
           {isAuthenticated ? (
             <UserProfile onLogout={handleLogout} />
           ) : (
