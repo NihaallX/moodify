@@ -16,11 +16,12 @@ const ContactModal = ({ isOpen, onClose }) => {
     setIsSubmitting(true);
 
     try {
-      // Using FormSubmit.co - same service as reviews
+      // Using FormSubmit.co with proper CORS handling
       const formData = new FormData();
       formData.append('_subject', `Moodify AI Access Request - ${message.subject}`);
-      formData.append('_next', window.location.href);
+      formData.append('_next', 'https://moodifyxd.vercel.app/'); // Redirect after submission
       formData.append('_captcha', 'false');
+      formData.append('_template', 'table'); // Use table template for better formatting
       formData.append('name', message.name || 'Anonymous');
       formData.append('email', message.email || 'Not provided');
       formData.append('subject', message.subject);
@@ -28,32 +29,43 @@ const ContactModal = ({ isOpen, onClose }) => {
       formData.append('request_type', 'AI Access Request');
       formData.append('timestamp', new Date().toLocaleString());
 
-      const response = await fetch('https://formsubmit.co/nihalpardeshi12344@gmail.com', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (response.ok) {
-        setSubmitted(true);
-        setTimeout(() => {
-          onClose();
-          setSubmitted(false);
-          setMessage({
-            name: '',
-            email: '',
-            subject: 'Interest in Moodify AI Full Version',
-            content: 'Hey Nihal, I\'m interested in the full AI version of Moodify!'
-          });
-        }, 2000);
-      } else {
-        throw new Error('Failed to send message');
+      // Create a hidden form and submit it instead of using fetch
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = 'https://formsubmit.co/nihalpardeshi12344@gmail.com';
+      form.style.display = 'none';
+      
+      // Add all form data as hidden inputs
+      for (let [key, value] of formData.entries()) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
       }
+      
+      document.body.appendChild(form);
+      form.submit();
+      
+      // Show success message immediately since we can't wait for response
+      setSubmitted(true);
+      setTimeout(() => {
+        onClose();
+        setSubmitted(false);
+        setMessage({
+          name: '',
+          email: '',
+          subject: 'Interest in Moodify AI Full Version',
+          content: 'Hey Nihal, I\'m interested in the full AI version of Moodify!'
+        });
+      }, 2000);
+      
     } catch (error) {
       console.error('Error sending message:', error);
-      alert('Failed to send message. Please try again.');
+      alert('There was an error sending your message. Please try again or contact nihalpardeshi12344@gmail.com directly.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
   };
 
   const handleInputChange = (field, value) => {
