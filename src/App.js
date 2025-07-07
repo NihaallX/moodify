@@ -11,6 +11,7 @@ import SpotifyCallback from './components/SpotifyCallback';
 import UserProfile from './components/UserProfile';
 import LocalDevAuth from './components/LocalDevAuth';
 import ReviewForm from './components/ReviewForm';
+import ContactModal from './components/ContactModal';
 import { detectMood } from './utils/moodDetection';
 import { DETECTION_TYPES } from './utils/moodDetection/constants';
 import spotifyService from './services/spotifyService';
@@ -24,6 +25,7 @@ function App() {
   const [activeInputMode, setActiveInputMode] = useState(DETECTION_TYPES.EMOJI); // Default to emoji mode
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [conversationalReply, setConversationalReply] = useState(null); // New state for AI reply
+  const [showContactModal, setShowContactModal] = useState(false); // New state for contact modal
 
   useEffect(() => {
     // Check if user is logged in on component mount
@@ -105,8 +107,14 @@ function App() {
     // We now show the banner everywhere, not just in local environments
     return (
       <div className="App">
-        <div className="dev-banner">
-          🚀 Want full access? 🎧 Shoot a message to <a href="mailto:nihalpardeshi12344@gmail.com">nihalpardeshi12344@gmail.com</a> for access
+        <div className="ai-access-banner">
+          <span className="banner-text">🤖 Want the full AI experience?</span>
+          <button 
+            className="contact-nihal-btn"
+            onClick={() => setShowContactModal(true)}
+          >
+            Mail Nihal for AI Access
+          </button>
         </div>      <header className="App-header">
         <div className="landing-link">
           <a href="/landing.html" className="back-to-landing-btn">
@@ -236,6 +244,11 @@ function App() {
       <ReviewForm 
         isOpen={showReviewForm}
         onClose={() => setShowReviewForm(false)}
+      />
+      
+      <ContactModal 
+        isOpen={showContactModal}
+        onClose={() => setShowContactModal(false)}
       />
     </div>
     );
