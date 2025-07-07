@@ -17,8 +17,8 @@ function InputSelector({ activeInput, onInputChange }) {
           className={activeInput === DETECTION_TYPES.CHAT ? 'active' : ''}
           onClick={() => onInputChange(DETECTION_TYPES.CHAT)}
         >
-          <span className="input-icon">💬</span>
-          <span className="input-label">AI Chat <span className="experimental-label">👨‍🔬 experimental</span></span>
+          <span className="input-icon brain-icon">🧠</span>
+          <span className="input-label">AI Chat <span className="experimental-label">✨ AI</span></span>
         </button>
       </div>
     </div>
