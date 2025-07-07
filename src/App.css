@@ -9,41 +9,64 @@ body {
   flex-direction: column;
 }
 
-.dev-banner {
-  background: linear-gradient(90deg, #8A2BE2, #FF69B4);
+.ai-access-banner {
+  background: linear-gradient(90deg, #667eea, #764ba2);
   color: white;
   text-align: center;
-  padding: 10px 20px;
-  font-weight: 600;
+  padding: 15px 20px;
   position: relative;
   z-index: 1000;
-  box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
   border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.banner-text {
+  font-weight: 600;
   font-size: 1rem;
   letter-spacing: 0.3px;
-  animation: bannerPulse 3s infinite alternate;
 }
 
-.dev-banner a {
-  color: #FFFFFF;
-  text-decoration: none;
-  margin-left: 5px;
-  position: relative;
-  font-weight: 700;
-  background: linear-gradient(90deg, #FFD700, #FF6B6B);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  border-bottom: 1px solid white;
-  padding: 0 4px;
+.contact-nihal-btn {
+  background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
   transition: all 0.3s ease;
-  display: inline-block;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: 0.3px;
+  box-shadow: 0 3px 8px rgba(255, 107, 107, 0.3);
 }
 
-.dev-banner a:hover {
+.contact-nihal-btn:hover {
   transform: translateY(-2px) scale(1.05);
-  border-bottom: 2px solid white;
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 6px 12px rgba(78, 205, 196, 0.4);
+}
+
+/* Mobile responsive for AI access banner */
+@media (max-width: 768px) {
+  .ai-access-banner {
+    padding: 12px 15px;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .banner-text {
+    font-size: 0.9rem;
+  }
+  
+  .contact-nihal-btn {
+    font-size: 0.85rem;
+    padding: 7px 18px;
+  }
 }
 
 .landing-link {
@@ -298,18 +321,6 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-/* Banner animation */
-@keyframes bannerPulse {
-  0% {
-    background: linear-gradient(90deg, #8A2BE2, #FF69B4);
-    box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
-  }
-  100% {
-    background: linear-gradient(90deg, #6A5ACD, #FF1493);
-    box-shadow: 0 4px 16px rgba(138, 43, 226, 0.5);
   }
 }
 
