@@ -250,6 +250,17 @@
   }
 }
 
+@keyframes slideInUp {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 @media (max-width: 768px) {
   .chat-container {
     height: 350px;
@@ -257,6 +268,15 @@
   
   .message-bubble {
     max-width: 85%;
+  }
+  
+  /* Responsive floating feedback */
+  .floating-feedback {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    max-width: none;
   }
 }
 
@@ -294,4 +314,44 @@
 @keyframes aiPulse {
   0% { transform: scale(1); }
   100% { transform: scale(1.05); }
+}
+
+/* Floating feedback for chat mode */
+.floating-feedback {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  border: 2px solid #e1e8ff;
+  max-width: 350px;
+  animation: slideInUp 0.3s ease-out;
+}
+
+.floating-feedback-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #666;
+  cursor: pointer;
+  padding: 5px;
+  line-height: 1;
+  z-index: 1001;
+}
+
+.floating-feedback-close:hover {
+  color: #333;
+}
+
+.floating-feedback .playlist-feedback {
+  margin: 0;
+  padding: 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 16px;
 }
