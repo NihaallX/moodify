@@ -21,14 +21,22 @@ function ChatInput({
   // Prepopulate with last input if available
   useEffect(() => {
     if (lastInput && typeof lastInput === 'string') {
-      // If there's a saved chat message, add it to history
-      const savedMessage = {
-        text: lastInput,
-        sender: 'user',
-        timestamp: new Date().toISOString()
-      };
-      setChatHistory([savedMessage]);
+      // Check if this message is already in the history to avoid duplicates
+      const messageExists = chatHistory.some(msg => 
+        msg.text === lastInput && msg.sender === 'user'
+      );
+      
+      if (!messageExists) {
+        // If there's a saved chat message, add it to history
+        const savedMessage = {
+          text: lastInput,
+          sender: 'user',
+          timestamp: new Date().toISOString()
+        };
+        setChatHistory(prev => [...prev, savedMessage]);
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastInput]);
 
   // Auto-scroll to bottom of chat
@@ -53,12 +61,16 @@ function ChatInput({
     }
   }, [currentMood, conversationalReply, awaitingPlaylistConfirmation, hasAddedFollowUp]);
 
-  // Reset chat state when parent resets
+  // Reset chat state when parent resets, but preserve chat history unless explicitly cleared
   useEffect(() => {
     if (!currentMood && !awaitingPlaylistConfirmation) {
       setHasAddedFollowUp(false);
+      // Only clear chat history if lastInput is also null (complete reset)
+      if (!lastInput) {
+        setChatHistory([]);
+      }
     }
-  }, [currentMood, awaitingPlaylistConfirmation]);
+  }, [currentMood, awaitingPlaylistConfirmation, lastInput]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -83,14 +95,15 @@ function ChatInput({
       
       // Add bot response about their choice
       const confirmationResponse = wantsPlaylists 
-        ? "Perfect! I'll pull up some great playlists for you right now. 🎵"
+        ? "Perfect! I'll pull up some great playlists for you right now. 🎵\n\nCheck out the playlist recommendations below! 👇"
         : "No worries! Feel free to chat with me anytime about how you're feeling. 😊";
       
       const botMessage = {
         text: confirmationResponse,
         sender: 'bot',
         timestamp: new Date().toISOString(),
-        isConfirmation: true
+        isConfirmation: true,
+        playlistsShown: wantsPlaylists
       };
       
       setChatHistory((prev) => [...prev, botMessage]);
@@ -138,7 +151,9 @@ function ChatInput({
         text: responseText,
         sender: 'bot',
         timestamp: new Date().toISOString(),
-        isMoodResponse: true
+        isMoodResponse: true,
+        moodBadge: currentMood, // Include the detected mood as a badge
+        isAiEnhanced: !!conversationalReply // Show AI badge if we have a conversational reply
       };
       
       setChatHistory((prev) => [...prev, botMessage]);
@@ -170,8 +185,18 @@ function ChatInput({
                 key={index}
                 className={`chat-message ${msg.sender === 'user' ? 'user-message' : 'bot-message'}`}
               >
-                <div className="message-bubble">
-                  <p>{msg.text}</p>
+                <div className={`message-bubble ${msg.isMoodResponse ? 'mood-response' : ''} ${msg.isFollowUp ? 'follow-up' : ''} ${msg.isConfirmation ? 'confirmation' : ''}`}>
+                  {msg.moodBadge && (
+                    <div className="mood-badge-container">
+                      <div className="mood-badge">{msg.moodBadge}</div>
+                      {msg.isAiEnhanced && (
+                        <div className="ai-badge" title="Enhanced by two-layer AI detection">
+                          🧠 AI
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <p style={{ whiteSpace: 'pre-line' }}>{msg.text}</p>
                 </div>
               </div>
             ))}

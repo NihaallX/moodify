@@ -90,6 +90,26 @@
   animation-name: slideInLeft;
 }
 
+/* Enhanced bot message styling for mood responses */
+.message-bubble.mood-response {
+  background: linear-gradient(135deg, #f0f8ff 0%, #e8f4fd 100%);
+  border: 1px solid #c3e4fd;
+  border-left: 4px solid #6e8efb;
+  box-shadow: 0 2px 8px rgba(110, 142, 251, 0.15);
+}
+
+.message-bubble.follow-up {
+  background: linear-gradient(135deg, #fff7e6 0%, #fef3e2 100%);
+  border: 1px solid #ffd6a5;
+  border-left: 4px solid #ff9500;
+}
+
+.message-bubble.confirmation {
+  background: linear-gradient(135deg, #f0fff4 0%, #e8f5e8 100%);
+  border: 1px solid #c6f6d5;
+  border-left: 4px solid #38a169;
+}
+
 .message-bubble p {
   margin: 0;
   word-break: break-word;
@@ -238,4 +258,40 @@
   .message-bubble {
     max-width: 85%;
   }
+}
+
+/* Mood badge styling within chat messages */
+.mood-badge-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.mood-badge {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
+  color: white;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+  font-weight: 600;
+}
+
+.ai-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
+  color: white;
+  border-radius: 15px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  animation: aiPulse 2s infinite alternate;
+  cursor: help;
+}
+
+@keyframes aiPulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
 }
