@@ -1,7 +1,7 @@
 import React from 'react';
 import './MoodMessage.css';
 
-function MoodMessage({ mood }) {
+function MoodMessage({ mood, conversationalReply }) {
   // Messages for each mood
   const moodMessages = {
     anxious: [
@@ -53,6 +53,11 @@ function MoodMessage({ mood }) {
 
   // Choose a random message for the detected mood
   const getMessage = (mood) => {
+    // Use conversational reply if available, otherwise use random message
+    if (conversationalReply) {
+      return conversationalReply;
+    }
+    
     const messages = moodMessages[mood] || ["Here's some music that matches your current mood."];
     const randomIndex = Math.floor(Math.random() * messages.length);
     return messages[randomIndex];
@@ -60,7 +65,14 @@ function MoodMessage({ mood }) {
 
   return (
     <div className="mood-message">
-      <div className="mood-badge">{mood}</div>
+      <div className="mood-badge-container">
+        <div className="mood-badge">{mood}</div>
+        {conversationalReply && (
+          <div className="ai-badge" title="Enhanced by two-layer AI detection">
+            🧠 AI
+          </div>
+        )}
+      </div>
       <p className="message-text">{getMessage(mood)}</p>
     </div>
   );

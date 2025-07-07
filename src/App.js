@@ -23,6 +23,7 @@ function App() {
   const [lastInputType, setLastInputType] = useState(null);
   const [activeInputMode, setActiveInputMode] = useState(DETECTION_TYPES.EMOJI); // Default to emoji mode
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [conversationalReply, setConversationalReply] = useState(null); // New state for AI reply
 
   useEffect(() => {
     // Check if user is logged in on component mount
@@ -64,9 +65,20 @@ function App() {
     
     // Detect mood based on input
     try {
-      const detectedMood = await detectMood(input, inputType);
-      setCurrentMood(detectedMood);
-      console.log(`Detected mood: ${detectedMood} from ${inputType} input`);
+      const detectionResult = await detectMood(input, inputType);
+      
+      // Handle different return formats
+      if (inputType === DETECTION_TYPES.CHAT && typeof detectionResult === 'object') {
+        // Two-layer chat detection returns an object
+        setCurrentMood(detectionResult.mood);
+        setConversationalReply(detectionResult.reply);
+        console.log(`Two-layer detection - Mood: ${detectionResult.mood}, Reply: ${detectionResult.reply}`);
+      } else {
+        // Emoji detection returns a string
+        setCurrentMood(detectionResult);
+        setConversationalReply(null);
+        console.log(`Detected mood: ${detectionResult} from ${inputType} input`);
+      }
     } catch (error) {
       console.error('Error detecting mood:', error);
       // Provide user feedback about the error
@@ -79,6 +91,7 @@ function App() {
   const handleReset = () => {
     setCurrentMood(null);
     setLastInput(null);
+    setConversationalReply(null); // Reset reply as well
     // Keep the current active input mode instead of forcing emoji mode
     setLastInputType(activeInputMode);
   };
@@ -93,7 +106,7 @@ function App() {
     return (
       <div className="App">
         <div className="dev-banner">
-          🚀 Want full access? 🎧 Shoot a message to <a href="mailto:nihalpardeshi12344@gmail.com">nihalpardeshi12344@gmail.com</a> for VIP access
+          🚀 Want full access? 🎧 Shoot a message to <a href="mailto:nihalpardeshi12344@gmail.com">nihalpardeshi12344@gmail.com</a> for access
         </div>      <header className="App-header">
         <div className="landing-link">
           <a href="/landing.html" className="back-to-landing-btn">
@@ -162,7 +175,7 @@ function App() {
         {currentMood && !isLoading && (
           <div className="results-side">
             <div className="results-container">
-              <MoodMessage mood={currentMood} />
+              <MoodMessage mood={currentMood} conversationalReply={conversationalReply} />
               <PlaylistRecommendation mood={currentMood} />
             </div>
           </div>
