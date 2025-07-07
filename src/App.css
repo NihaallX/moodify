@@ -317,10 +317,24 @@ body {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 15px;
-  flex-wrap: wrap;
   justify-content: center;
+  flex-wrap: wrap;
   margin-top: 15px;
+  width: 100%;
+  position: relative;
+  gap: 15px;
+}
+
+/* When user is not authenticated, center the Spotify button perfectly */
+.header-actions.with-spotify-button {
+  justify-content: center;
+}
+
+.header-actions.with-spotify-button .review-button-header {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .review-button-header {
@@ -385,6 +399,12 @@ body {
   .header-actions {
     flex-direction: column;
     gap: 10px;
+    position: static;
+  }
+  
+  .header-actions.with-spotify-button .review-button-header {
+    position: static;
+    transform: none;
   }
   
   .review-button-header {
