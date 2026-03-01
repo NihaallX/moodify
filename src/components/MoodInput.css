@@ -1,11 +1,18 @@
 .mood-input {
-  background-color: white;
+  background: #111111;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  box-shadow: none;
   margin-top: 1rem;
-  border: 1px solid rgba(234, 234, 255, 0.5);
-  transition: all 0.3s ease;
+  border: 1px solid #2a2a2a;
+  transition: border-color 0.3s ease;
+}
+
+.mood-input:hover {
+  box-shadow: none;
+  border-color: #c084fc;
 }
 
 .emoji-input-form {
@@ -23,39 +30,47 @@
 
 .emoji-header h3 {
   margin: 0;
-  font-size: 1.6rem;
-  color: #333;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #c084fc 0%, #f472b6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   font-weight: 600;
+  font-family: 'IBM Plex Mono', monospace;
 }
 
 .emoji-header p {
   margin: 0.5rem 0 0;
-  font-size: 1rem;
-  color: #777;
+  font-size: 0.8rem;
+  color: #888;
+  font-family: 'IBM Plex Mono', monospace;
 }
 
 .reset-button {
   position: absolute;
   top: 0;
   right: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f0f0f0;
-  border: none;
-  color: #777;
-  font-size: 1.2rem;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  color: #888;
+  font-size: 1rem;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
 }
 
 .reset-button:hover {
-  transform: rotate(180deg);
-  background-color: #e0e0e0;
+  transform: rotate(90deg);
+  background: #c084fc;
+  color: #000;
+  border-color: #c084fc;
 }
 
 .emoji-slider-container {
@@ -83,45 +98,47 @@
 .emoji-slider {
   flex: 1;
   margin: 0 15px;
-  height: 10px;
+  height: 12px;
   -webkit-appearance: none;
   appearance: none;
-  background: linear-gradient(90deg, #6a77b0, #896cec, #ff6b6b);
+  background: linear-gradient(90deg, #6a77b0, #896cec, #a777e3, #ff6b8a);
   outline: none;
   border-radius: 15px;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.15), 0 1px 4px rgba(110,142,251,0.2);
 }
 
 .emoji-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  background: #111111;
+  border: 2px solid #c084fc;
+  box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.2);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .emoji-slider::-moz-range-thumb {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  background: #111111;
+  border: 2px solid #c084fc;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .emoji-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.1);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  transform: scale(1.15);
+  border-color: #6e8efb;
+  box-shadow: 0 4px 14px rgba(110,142,251,0.45), 0 0 0 5px rgba(110,142,251,0.12);
 }
 
 .emoji-slider::-moz-range-thumb:hover {
-  transform: scale(1.1);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  transform: scale(1.15);
+  box-shadow: 0 4px 14px rgba(110,142,251,0.45);
 }
 
 .mood-details {
@@ -132,50 +149,59 @@
 }
 
 .current-emoji {
-  font-size: 4rem;
+  font-size: 4.5rem;
   margin-bottom: 0.5rem;
-  animation: pulseEmoji 2s infinite alternate;
+  animation: pulseEmoji 2.5s ease-in-out infinite alternate;
+  filter: drop-shadow(0 4px 8px rgba(167, 119, 227, 0.3));
+  line-height: 1.1;
 }
 
 .mood-description {
-  font-size: 1.1rem;
-  color: #555;
-  font-weight: 500;
+  font-size: 0.82rem;
+  color: #888;
+  font-weight: 400;
   text-align: center;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 1px;
 }
 
 .find-music-btn {
-  background: linear-gradient(90deg, #8A2BE2, #FF69B4);
-  color: white;
-  border: none;
-  padding: 1rem 2rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  border-radius: 30px;
+  background: transparent;
+  color: #c084fc;
+  border: 1px solid #c084fc;
+  padding: 0.85rem 2rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  border-radius: 4px;
   cursor: pointer;
   margin-top: 1rem;
-  transition: all 0.3s;
-  box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+  transition: all 0.2s;
   width: 100%;
   max-width: 350px;
   align-self: center;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
 .find-music-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4);
+  background: #c084fc;
+  color: #000;
+  transform: translateY(-1px);
 }
 
 .find-music-btn:active {
-  transform: translateY(1px);
+  transform: translateY(0);
 }
 
 @keyframes pulseEmoji {
   0% {
-    transform: scale(1);
+    transform: scale(1) rotate(-2deg);
+    filter: drop-shadow(0 4px 8px rgba(167, 119, 227, 0.3));
   }
   100% {
-    transform: scale(1.1);
+    transform: scale(1.12) rotate(2deg);
+    filter: drop-shadow(0 6px 14px rgba(110, 142, 251, 0.4));
   }
 }
 

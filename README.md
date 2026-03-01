@@ -1,136 +1,137 @@
-# Moodify 🎵
+# MOODIFY
 
-A mood-based music recommendation web application that suggests Spotify playlists based on your current emotional state using AI-powered emotion detection.
+> AI-powered mood detection → personalized song recommendations via Spotify
 
-(![moodify-logo png](https://github.com/user-attachments/assets/ec1a7b94-b088-493f-9383-cf19d57691e6)
+Live: **https://moodifyxd.vercel.app**
 
-## Features
+---
 
-- **Mood Detection**: Input your mood via text or an emoji slider
-- **Spotify Integration**: Connect to your Spotify account for personalized recommendations
-- **Playlist Recommendation**: Get Spotify playlists that match your current mood
-- **Emotional Messages**: Receive supportive or celebratory messages based on your mood
-- **Simple, Clean UI**: Easy-to-use interface with no unnecessary complexity
-- **Secure Authentication**: Using PKCE flow for enhanced security
+## What it does
 
-## Tech Stack
+Moodify reads your current vibe and surfaces songs that match. Two ways to express how you feel:
 
-- **Frontend**: React with plain CSS
-- **External APIs**: Prepared for Spotify API integration
-- **Mood Detection**: 
-  - Emoji Slider: Simple valence-arousal mood mapping
-  - AI Chat: Uses Mistral-based sentiment analysis (experimental)
+- **Emoji Slider** — drag across a spectrum of moods, pick intensity, choose genres
+- **AI Chat** — describe your mood in plain text; a Groq LLM parses the context and returns a mood label + songs
 
-## AI Mood Detection
+Once a mood is detected, Moodify hits the Spotify Recommendations API and returns 8 songs with album art, a 30-second preview, and a direct link to Spotify.
 
-This application now features advanced AI-powered mood detection using the Hartmann emotion-english-distilroberta-base model (DistilBERT for Emotion Classification). The AI can detect multiple emotions from text input with high accuracy.
+---
 
-### Supported Emotions
-- Joy / Happiness
-- Sadness
-- Anger
-- Fear
-- Surprise
-- Disgust / Contempt
-- And more nuanced emotional states
+## Stack
 
-### Environment Variables
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, React Router v7 |
+| AI / Mood detection | Groq API (`llama-3.3-70b-versatile`) |
+| Music data | Spotify Web API (PKCE OAuth) |
+| Styling | IBM Plex Mono + Montserrat, dark theme |
+| Hosting | Vercel |
 
-For local development, copy `.env.example` to `.env` and add your tokens:
+---
 
-```bash
-cp .env.example .env
+## Architecture
+
+```
+User Input
+  ├── Emoji slider  →  MoodInput.js  →  mood string
+  └── AI chat       →  ChatInput.js  →  groqDetector.js  →  mood string
+                                              ↓
+                                Groq: llama-3.3-70b-versatile
+                                              ↓
+                                mood label (happy / sad / energetic / calm /
+                                            anxious / angry / study / soothing / focused)
+                                              ↓
+                                spotifyService.getSongsByMood()
+                                              ↓
+                                Spotify Recommendations API
+                                (seed genres + seed tracks, shuffled, deduplicated)
+                                              ↓
+                                SongCard grid (album art, preview, open in Spotify)
 ```
 
-Then edit `.env` and add your Hugging Face API token:
-```
-REACT_APP_HUGGINGFACE_TOKEN=your_huggingface_token_here
-```
+---
 
-You can get a free Hugging Face API token from [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens).
-
-## Deployment
-
-The application is automatically deployed to GitHub Pages using GitHub Actions. The deployment workflow:
-
-1. **Triggers**: On push to `master` branch or manual workflow dispatch
-2. **Build**: Installs dependencies and builds the React app with environment variables
-3. **Deploy**: Uses official GitHub Pages actions for secure deployment
-
-### GitHub Pages Setup
-
-The repository is configured for GitHub Pages deployment:
-- **Source**: GitHub Actions
-- **Custom Domain**: Not configured (uses default GitHub Pages URL)
-- **Environment Variables**: Stored as GitHub repository secrets
-
-### Environment Variables for Production
-
-Add the following secrets to your GitHub repository (Settings → Secrets and variables → Actions):
-
-- `REACT_APP_HUGGINGFACE_TOKEN`: Your Hugging Face API token
-
-## Getting Started
+## Getting started
 
 ### Prerequisites
 
-- Node.js and npm
+- Node.js 18+
+- A [Spotify Developer](https://developer.spotify.com/dashboard) app with PKCE enabled
+- A [Groq](https://console.groq.com) API key
 
-### Installation
+### Install
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/yourusername/moodify.git
-   cd moodify
-   ```
+```bash
+git clone https://github.com/nihaallx/moodify
+cd moodify
+npm install
+```
 
-2. Install dependencies:
-   ```
-   npm install
-   ```
+### Environment variables
 
-3. Start the development server:
-   ```
-   npm start
-   ```
+Create `.env.local` in the project root:
 
-4. Open your browser and navigate to:
-   ```
-   http://localhost:3000
-   ```
+```env
+REACT_APP_GROQ_API_KEY=gsk_...
+REACT_APP_SPOTIFY_REDIRECT_URI=http://127.0.0.1:3000/callback
+HOST=127.0.0.1
+```
 
-## Spotify API Integration
+Add `http://127.0.0.1:3000/callback` as a Redirect URI in your Spotify app dashboard.
 
-Moodify now integrates with the Spotify API using the PKCE (Proof Key for Code Exchange) authentication flow for enhanced security. To set up:
+### Run locally
 
-1. Create a Spotify Developer account at [https://developer.spotify.com](https://developer.spotify.com)
-2. Register a new application in the Spotify Developer Dashboard:
-   - Set your redirect URI to `https://nihaallx.github.io/moodify/` (with trailing slash, Spotify requires HTTPS for security reasons)
-   - Request the following scopes: `user-read-private`, `user-read-email`, `playlist-read-private`, `playlist-read-collaborative`, `user-top-read`, `user-read-recently-played`, `user-library-read`
+```bash
+npm start
+```
 
-3. Update the `clientId` in `src/services/spotifyService.js` with your Client ID
+App opens at `http://127.0.0.1:3000`.
 
-4. Authenticate with Spotify by clicking the "Connect with Spotify" button in the app
+---
 
-The PKCE flow offers several advantages:
-- More secure than Implicit Grant (no client secret needed in frontend)
-- Supports refresh tokens for longer sessions
-- Better user experience with automatic token refreshing
+## Project structure
 
-## Future Enhancements
+```
+src/
+├── components/
+│   ├── MoodInput.js / .css        # Emoji slider + genre picker
+│   ├── InputSelector.js / .css    # Toggle between slider and chat
+│   ├── ChatInput.js / .css        # AI chat interface
+│   ├── SongCard.js / .css         # Individual song tile
+│   ├── SongRecommendation.js/.css # Song grid + heading
+│   ├── MoodMessage.js / .css      # Detected-mood display card
+│   ├── SpotifyCallback.js         # OAuth callback handler
+│   └── LocalDevAuth.js            # Dev-only Spotify auth shortcut
+├── services/
+│   ├── spotifyService.js          # Spotify API wrapper + mock data
+│   └── groqDetector.js            # Groq LLM mood detection
+├── App.js / App.css               # Root layout, header, Jack mascot
+└── index.css                      # Global dark theme + grid background
+public/
+├── landing.html                   # Static landing page
+├── jack-front.png                 # Jack mascot (floating bottom-right)
+└── jack-ufo.png                   # Jack UFO footer asset
+```
 
-- User authentication
-- History of mood tracking
-- More sophisticated mood detection
-- Dynamic playlist generation
-- Mobile app version
+---
 
-## Credits
+## Supported moods
 
-- Created as a prototype for mood-based music recommendations
-- Uses Spotify's extensive playlist catalog
+`happy` · `sad` · `energetic` · `calm` · `anxious` · `angry` · `study` · `soothing` · `focused`
 
-## Made with ❤️ by Nihal
+---
+
+## Design
+
+Dark theme inspired by the Jack alien mascot design system:
+- Background: `#000000` with `rgba(192,132,252,0.05)` purple grid
+- Accent: `#c084fc` (purple) + `#f472b6` (pink)
+- Typography: IBM Plex Mono (mono) + Montserrat (display)
+- Cards: `#111111` with `1px solid #2a2a2a` borders
+
+---
+
+## Made by Nihal
 
 ## License
 

@@ -12,19 +12,19 @@ function MoodInput({ onMoodSubmit, lastInput, lastInputType, showReset, onReset 
     }
   }, [lastInput, lastInputType]);
   
-  // Enhanced emoji mapping for the slider with more emotions
+  // Emoji mapping for the mood slider (0 = most sad, 10 = most energetic/intense)
   const emojiMap = [
-    "😔", // Sad
-    "😟", // Worried
-    "😐", // Neutral
-    "🙂", // Slightly Happy
-    "😊", // Content
-    "😃", // Happy
-    "�", // Cool
-    "😤", // Focused
-    "😡", // Angry
-    "🥳", // Party
-    "😴"  // Sleepy
+    "😭", // 0 - Very sad
+    "😢", // 1 - Sad
+    "😔", // 2 - Down / pensive
+    "😌", // 3 - Calm / at peace
+    "🙂", // 4 - Gentle / soothing
+    "😊", // 5 - Content / focused
+    "😄", // 6 - Happy
+    "😁", // 7 - Very happy
+    "🤩", // 8 - Excited
+    "⚡", // 9 - Energetic
+    "🔥"  // 10 - Intense / pumped
   ];
 
   const handleEmojiSubmit = () => {

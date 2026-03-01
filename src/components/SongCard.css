@@ -1,0 +1,177 @@
+.song-card {
+  background: #111111;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #2a2a2a;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+  height: 100%;
+}
+
+.song-card:hover {
+  transform: translateY(-3px);
+  border-color: #c084fc;
+}
+
+/* ── Artwork ────────────────────────────────────────────── */
+.song-artwork {
+  position: relative;
+  height: 160px;
+  overflow: hidden;
+  background: #1a1a1a;
+}
+
+.song-artwork img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.song-card:hover .song-artwork img {
+  transform: scale(1.04);
+}
+
+.art-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a1a;
+}
+
+.art-spinner {
+  width: 36px;
+  height: 36px;
+  border: 2px solid #2a2a2a;
+  border-radius: 50%;
+  border-top-color: #c084fc;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Preview overlay button ────────────────────────────── */
+.preview-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.preview-btn:hover,
+.preview-btn.playing {
+  background: #c084fc;
+}
+
+/* ── Track Info ──────────────────────────────────────────── */
+.song-info {
+  padding: 0.9rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  text-align: left;
+}
+
+.song-title {
+  margin: 0 0 0.25rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #f5f5f5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.song-artist {
+  margin: 0 0 0.15rem;
+  font-size: 0.78rem;
+  color: #888;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.song-album {
+  margin: 0 0 0.75rem;
+  font-size: 0.72rem;
+  color: #555;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* ── Actions row ─────────────────────────────────────────── */
+.song-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: auto;
+  flex-wrap: wrap;
+}
+
+.preview-text-btn {
+  font-size: 0.72rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid #2a2a2a;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.preview-text-btn:hover,
+.preview-text-btn.playing {
+  background: #c084fc;
+  color: #000;
+  border-color: #c084fc;
+}
+
+.no-preview {
+  font-size: 0.7rem;
+  color: #444;
+  white-space: nowrap;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.open-spotify-btn {
+  font-size: 0.72rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 4px;
+  background: transparent;
+  border: 1px solid #c084fc;
+  color: #c084fc;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.open-spotify-btn:hover {
+  background: #c084fc;
+  color: #000;
+}

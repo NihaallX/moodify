@@ -5,7 +5,7 @@ import MoodInput from './components/MoodInput';
 import ChatInput from './components/ChatInput';
 import InputSelector from './components/InputSelector';
 import MoodMessage from './components/MoodMessage';
-import PlaylistRecommendation from './components/PlaylistRecommendation';
+import SongRecommendation from './components/SongRecommendation';
 import SpotifyLoginButton from './components/SpotifyLoginButton';
 import SpotifyCallback from './components/SpotifyCallback';
 import UserProfile from './components/UserProfile';
@@ -24,10 +24,8 @@ function App() {
   const [lastInputType, setLastInputType] = useState(null);
   const [activeInputMode, setActiveInputMode] = useState(DETECTION_TYPES.EMOJI); // Default to emoji mode
   const [showReviewForm, setShowReviewForm] = useState(false);
-  const [conversationalReply, setConversationalReply] = useState(null); // New state for AI reply
-  const [showContactModal, setShowContactModal] = useState(false); // New state for contact modal
-  const [awaitingPlaylistConfirmation, setAwaitingPlaylistConfirmation] = useState(false); // Track if waiting for user confirmation
-  const [shouldShowPlaylists, setShouldShowPlaylists] = useState(true); // Control playlist display
+  const [conversationalReply, setConversationalReply] = useState(null); // Groq reply
+  const [showContactModal, setShowContactModal] = useState(false);
 
   useEffect(() => {
     // Check if user is logged in on component mount
@@ -71,24 +69,15 @@ function App() {
     try {
       const detectionResult = await detectMood(input, inputType);
       
-      // Handle different return formats
-      if (inputType === DETECTION_TYPES.CHAT && typeof detectionResult === 'object') {
-        // Two-layer chat detection returns an object
+      // Chat returns {mood, reply}; emoji returns a plain string
+      if (typeof detectionResult === 'object' && detectionResult.mood) {
         setCurrentMood(detectionResult.mood);
         setConversationalReply(detectionResult.reply);
-        
-        // For chat mode, show follow-up question and wait for confirmation
-        setAwaitingPlaylistConfirmation(true);
-        setShouldShowPlaylists(false);
-        
-        console.log(`Two-layer detection - Mood: ${detectionResult.mood}, Reply: ${detectionResult.reply}`);
+        console.log(`Groq mood: ${detectionResult.mood}`);
       } else {
-        // Emoji detection returns a string - show playlists immediately
         setCurrentMood(detectionResult);
         setConversationalReply(null);
-        setAwaitingPlaylistConfirmation(false);
-        setShouldShowPlaylists(true);
-        console.log(`Detected mood: ${detectionResult} from ${inputType} input`);
+        console.log(`Emoji mood: ${detectionResult}`);
       }
     } catch (error) {
       console.error('Error detecting mood:', error);
@@ -99,18 +88,10 @@ function App() {
     }
   };
   
-  const handlePlaylistConfirmation = (confirmed) => {
-    setAwaitingPlaylistConfirmation(false);
-    setShouldShowPlaylists(confirmed);
-  };
-  
   const handleReset = () => {
     setCurrentMood(null);
     setLastInput(null);
-    setConversationalReply(null); // Reset reply as well
-    setAwaitingPlaylistConfirmation(false); // Reset confirmation state
-    setShouldShowPlaylists(true); // Reset playlist display
-    // Keep the current active input mode instead of forcing emoji mode
+    setConversationalReply(null);
     setLastInputType(activeInputMode);
   };
 
@@ -162,6 +143,12 @@ function App() {
         </div>
       </header>
       
+      {/* Jack mascot — floating bottom-right */}
+      <div className="jack-mascot" title="Jack says: pick a vibe!">
+        <img src={`${process.env.PUBLIC_URL}/jack-front.png`} alt="Jack mascot" />
+        <div className="jack-bubble">pick a vibe 🎵</div>
+      </div>
+      
       {!isAuthenticated && process.env.NODE_ENV === 'development' && (
         <LocalDevAuth />
       )}
@@ -182,13 +169,11 @@ function App() {
               onReset={handleReset}
             />
           ) : (
-            <ChatInput 
+            <ChatInput
               onMoodSubmit={handleMoodSubmission}
               lastInput={lastInputType === DETECTION_TYPES.CHAT ? lastInput : null}
               currentMood={currentMood}
               conversationalReply={conversationalReply}
-              awaitingPlaylistConfirmation={awaitingPlaylistConfirmation}
-              onPlaylistConfirmation={handlePlaylistConfirmation}
             />
           )}
           
@@ -207,7 +192,7 @@ function App() {
               {activeInputMode === DETECTION_TYPES.EMOJI && (
                 <MoodMessage mood={currentMood} conversationalReply={conversationalReply} />
               )}
-              {shouldShowPlaylists && <PlaylistRecommendation mood={currentMood} />}
+              <SongRecommendation mood={currentMood} />
             </div>
           </div>
         )}
@@ -217,7 +202,7 @@ function App() {
         <div className="footer-content">
           <div className="footer-section">
             <h3>About Moodify</h3>
-            <p>Moodify analyzes your mood and recommends Spotify playlists to match how you're feeling.</p>
+            <p>Moodify analyzes your mood and recommends individual Spotify songs matched to how you're feeling.</p>
           </div>
           
           <div className="footer-section">

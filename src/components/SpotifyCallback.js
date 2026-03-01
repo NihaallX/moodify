@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import spotifyService from '../services/spotifyService';
-import { parseCallbackURL, getStoredCodeVerifier } from '../utils/authUtils';
+import { getStoredCodeVerifier } from '../utils/authUtils';
 
 function SpotifyCallback() {
   const navigate = useNavigate();
@@ -10,73 +10,54 @@ function SpotifyCallback() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        let code, state;
-        console.log("Processing callback at:", window.location.href);
-        
-        // Check if we have the code verifier first
+        console.log('Processing callback at:', window.location.href);
+
+        const searchParams = new URLSearchParams(window.location.search);
+
+        // Spotify sends ?error=access_denied (or similar) when the user denies or
+        // something goes wrong on their side — surface that immediately.
+        if (searchParams.has('error')) {
+          const spotifyError = searchParams.get('error');
+          throw new Error(`Spotify returned an error: ${spotifyError}`);
+        }
+
+        const code  = searchParams.get('code');
+        const state = searchParams.get('state');
+
+        if (!code || !state) {
+          // Log the full URL to help debug redirect URI mismatches
+          console.error('Callback URL has no code/state:', window.location.href);
+          throw new Error(
+            'Missing authorization code in the callback URL. ' +
+            'Make sure the redirect URI in your Spotify Developer Dashboard matches: ' +
+            window.location.origin + '/callback'
+          );
+        }
+
+        console.log(`Found code (length: ${code.length}) and state`);
+
+        // Verify the stored PKCE code verifier
         const codeVerifier = getStoredCodeVerifier();
         if (!codeVerifier) {
-          setStatus('Authentication error: Missing code verifier. Please try again.');
-          throw new Error('Missing code verifier. Please try authenticating again.');
+          throw new Error('Missing PKCE code verifier — please try connecting again.');
         }
-        
-        // Get parameters from the URL search string (BrowserRouter standard approach)
-        const searchParams = new URLSearchParams(window.location.search);
-        if (searchParams.has('code') && searchParams.has('state')) {
-          code = searchParams.get('code');
-          state = searchParams.get('state');
-          console.log("Found parameters in search string");
-        }
-        
-        // Final fallback to our utility function
-        if (!code || !state) {
-          console.log("Using parseCallbackURL as fallback");
-          setStatus('Looking for authorization parameters...');
-          try {
-            const urlParams = parseCallbackURL(window.location.href);
-            code = urlParams.get('code');
-            state = urlParams.get('state');
-          } catch (e) {
-            console.error("Error parsing callback URL:", e);
-          }
-        }
-        
-        if (!code || !state) {
-          setStatus('Authentication error: Could not find authorization parameters.');
-          throw new Error('Missing authorization code or state in the callback URL');
-        }
-        
-        // Log the received code
-        console.log(`Found authorization code (length: ${code.length}) and state (${state})`);
-        
-        // In development mode, we might be using the manual local auth helper,
-        // so we should check if the state matches what we stored, but not fail if it doesn't
+
+        // State check (skip in dev to make localhost testing easier)
         const storedState = localStorage.getItem('spotify_auth_state');
-        const isDevMode = process.env.NODE_ENV === 'development';
-        
-        if (!isDevMode && state !== storedState) {
-          setStatus('Authentication error: State mismatch.');
-          throw new Error('State mismatch. Possible cross-site forgery attack.');
+        if (process.env.NODE_ENV !== 'development' && state !== storedState) {
+          throw new Error('State mismatch — possible CSRF attack.');
         }
-          setStatus('Exchanging authorization code for tokens...');
-        // Handle the authorization code exchange for tokens
+
+        setStatus('Exchanging authorization code for tokens...');
         await spotifyService.handleCallback(code);
-        
+
         setStatus('Authentication successful! Redirecting...');
-        // Short delay to allow user to see success message
-        setTimeout(() => {
-          // Redirect to home after successful authentication
-          navigate('/');
-        }, 1000);
+        setTimeout(() => navigate('/'), 1000);
+
       } catch (error) {
         console.error('Authentication error:', error);
         setStatus(`Authentication failed: ${error.message}`);
-        
-        // Short delay to allow user to see error message
-        setTimeout(() => {
-          // Redirect to home on error
-          navigate('/', { state: { error: error.message } });
-        }, 3000);
+        setTimeout(() => navigate('/', { state: { error: error.message } }), 3000);
       }
     };
 
