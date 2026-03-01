@@ -9,6 +9,10 @@ import App from './App';
 if (window.location.hostname === 'localhost') {
   window.location.replace(window.location.href.replace('localhost', '127.0.0.1'));
 } else {
+  // Strip the ?launch param from the URL bar (used by landing page redirect)
+  if (window.location.search.includes('launch')) {
+    window.history.replaceState({}, '', window.location.pathname);
+  }
   const root = ReactDOM.createRoot(document.getElementById('root'));
   root.render(
     <React.StrictMode>

@@ -24,6 +24,13 @@
     <title>Moodify</title>
   </head>
   <body>
+    <script>
+      // Show landing page first unless arriving from it (?launch)
+      if (window.location.search.indexOf('launch') === -1 &&
+          window.location.pathname !== '/landing.html') {
+        window.location.replace('/landing.html');
+      }
+    </script>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
   </body>
